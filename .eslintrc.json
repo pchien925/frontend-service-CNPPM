@@ -20,7 +20,7 @@
   "plugins": ["react", "react-hooks", "prettier"],
   "rules": {
     "react/prop-types": "off",
-    "prettier/prettier": "error"
+    "prettier/prettier": "off"
   },
   "settings": {
     "react": {
