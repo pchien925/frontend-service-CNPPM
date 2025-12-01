@@ -1,0 +1,89 @@
+@use '../abstracts';
+
+html {
+    --secondary-600: #2484c2;
+    --Secondary-700: #1b6292a4;
+
+    --white: #fff;
+    --gray: #9b9b9b;
+    --black: #00000026;
+    --blue: #4419ff;
+    --brown: #8C9197;
+    --red: #fe2b2b;
+    --green: #00a51e;
+    //  ==================================================
+    --primary-color: #389cfb;
+    --light-color: #e8f4f3;
+    --secondary-color: #d6e4ff;
+    --text-color: #313957;
+    --text-secondary-color: #495560;
+    --text-green: #00a51e;
+    --text-blue: #389cfb;
+    --text-gray: #c1c1c1;
+    --text-black: #313957;
+    --green-background: #f2faf4;
+    --footer-color: #3F3F3F;
+    --background-color: #FFFFFF;
+    --secondary-background-color: #F8FAFC;
+    --text-black-gray: #4A5660;
+    --light-green: #f2faf4;
+    --light-red: #fdeae5;
+    --light-gray: #d0d0d0;
+
+    --body-color: white;
+    --header-height: 5.5rem;
+    --banner-cart-height: 13.125rem;
+
+    /* ======== Colors ======== */
+    /* Color mode HSL (hue, saturation, lightness) */
+    --sub-color: #00858f;
+    --title-color: #00acc1;
+    --title-color-2: #919191;
+    --title-color-sub: #137755;
+    --background-color-light: #e0f2f1;
+    --text-color-light: #ffffff;
+    --second-color: #54b5ae;
+    --content-color: #000000;
+    --container-color: white;
+    --input-color: #8d8d8d;
+    --star-color: #ead14c;
+    --border-radius: 10px;
+    --red-color: #ff0000;
+    --orange-color: #f37d3b;
+    --green-color: #69BB3D;
+    --border-color: #e0e0e0;
+
+    /* ======== Font weight ======== */
+    --font-normal: 400;
+    --font-semi-bold: 500;
+    --font-bold: 600;
+
+    /* ======== Font and typography ======== */
+    --body-font: sans-serif;
+
+    /* ======== .5rem = 8px | 1rem = 16px ======== */
+    --big-font-size: 64px;
+    --h1-font-size: 64px;
+    --h2-font-size: 48px;
+    --h3-font-size: 34px;
+    --primary-font-size: 22px;
+    --sub-font-size: 18px;
+    --small-font-size: 15px;
+
+    /* ======= color for category ======== */
+    --gray-bg: #fdfdfd;
+    --category-name: #00acc1;
+    --product-container-bg: #f3f4f9;
+    --black-cate-name: #828282;
+    --product-name: #404040;
+    --product-price: #0097a7;
+
+    --button: #1bc9e6;
+
+    /* ======= font size mobile ======== */
+    --primary-font-size-mb: 10px;
+    --sub-font-size-mb: 8px;
+    --small-font-size-mb: 7px;
+
+    --box-shadow: 0px -2px 15px 0px rgba(0, 172, 193, 0.2);
+}
