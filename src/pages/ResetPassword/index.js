@@ -106,7 +106,7 @@ export default function ResetPasswordPage() {
                 required: 'Vui lòng nhập OTP',
                 pattern: {
                   value: /^\d{4,6}$/,
-                  message: 'OTP không hợp lệ',
+                  message: 'OTP không hợp lệ, vui lòng kiểm tra lại',
                 },
               })}
             />
