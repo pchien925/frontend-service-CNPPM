@@ -1,37 +1,45 @@
-import React, { useState } from "react";
-import { useForm, FormProvider } from "react-hook-form";
-import InputField from "../../components/ui/InputField";
-import PasswordField from "../../components/ui/PasswordField";
-import Button from "../../components/ui/Button";
+import React, { useState } from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
+import InputField from '../../components/ui/InputField';
+import PasswordField from '../../components/ui/PasswordField';
+import Button from '../../components/ui/Button';
+import apiClient from '../../services/apiClient';
 
 export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
 
   const defaultValues = {
     kind: 0,
-    username: "",
-    email: "",
-    password: "",
-    fullName: "",
-    phone: "",
-    avatarPath: "",
+    username: '',
+    email: '',
+    password: '',
+    fullName: '',
+    phone: '',
+    avatarPath: '',
     groupId: 16,
   };
 
   const methods = useForm({ defaultValues });
-  const { register, handleSubmit, formState: { errors } } = methods;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = methods;
 
   const onSubmit = async (data) => {
-      setLoading(true);
-    console.log("Dữ liệu đăng ký:", data);
+    setLoading(true);
+    console.log('Submit data:', data);
 
-    // Giả lập delay API
-      await new Promise((r) => setTimeout(r, 1200));
-
-    setLoading(false);
-    alert("Tạo tài khoản thành công!");
+    try {
+      const res = await apiClient.post('/api/auth/register', data);
+      console.log('res', res.data);
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.');
+    } finally {
+      setLoading(false);
+    }
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-light-primary/10 p-4">
       <div className="w-full max-w-lg bg-white p-8 rounded-2xl shadow-xl">
@@ -40,18 +48,20 @@ export default function RegisterPage() {
         </h2>
 
         <FormProvider {...methods}>
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
-
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col gap-3"
+          >
             <InputField
               label="Tên đăng nhập"
               placeholder="Nhập tên đăng nhập"
               fullWidth
               required
               error={errors.username?.message}
-              {...register("username", {
-                required: "Vui lòng nhập tên đăng nhập",
-                minLength: { value: 3, message: "Tối thiểu 3 ký tự" },
-                maxLength: { value: 255, message: "Tối đa 255 ký tự" },
+              {...register('username', {
+                required: 'Vui lòng nhập tên đăng nhập',
+                minLength: { value: 3, message: 'Tối thiểu 3 ký tự' },
+                maxLength: { value: 255, message: 'Tối đa 255 ký tự' },
               })}
             />
 
@@ -61,9 +71,12 @@ export default function RegisterPage() {
               fullWidth
               required
               error={errors.email?.message}
-              {...register("email", {
-                required: "Vui lòng nhập email",
-                pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Định dạng email không hợp lệ" },
+              {...register('email', {
+                required: 'Vui lòng nhập email',
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: 'Định dạng email không hợp lệ',
+                },
               })}
             />
 
@@ -73,10 +86,13 @@ export default function RegisterPage() {
               fullWidth
               required
               error={errors.password?.message}
-              {...register("password", {
-                required: "Vui lòng nhập mật khẩu",
-                minLength: { value: 6, message: "Mật khẩu phải có ít nhất 6 ký tự" },
-                maxLength: { value: 255, message: "Tối đa 255 ký tự" },
+              {...register('password', {
+                required: 'Vui lòng nhập mật khẩu',
+                minLength: {
+                  value: 6,
+                  message: 'Mật khẩu phải có ít nhất 6 ký tự',
+                },
+                maxLength: { value: 255, message: 'Tối đa 255 ký tự' },
               })}
             />
 
@@ -86,7 +102,7 @@ export default function RegisterPage() {
               fullWidth
               required
               error={errors.fullName?.message}
-              {...register("fullName", { required: "Vui lòng nhập họ và tên" })}
+              {...register('fullName', { required: 'Vui lòng nhập họ và tên' })}
             />
 
             <InputField
@@ -94,19 +110,21 @@ export default function RegisterPage() {
               placeholder="Nhập số điện thoại (không bắt buộc)"
               fullWidth
               error={errors.phone?.message}
-              {...register("phone", {
-                pattern: { value: /^[0-9+\-()\s]*$/, message: "Số điện thoại không hợp lệ" },
+              {...register('phone', {
+                pattern: {
+                  value: /^[0-9+\-()\s]*$/,
+                  message: 'Số điện thoại không hợp lệ',
+                },
               })}
             />
 
             <Button type="submit" fullWidth loading={loading} className="mt-5">
               Đăng ký
             </Button>
-
           </form>
         </FormProvider>
         <p className="mt-3 text-center text-sm text-gray-500">
-          Đã có tài khoản?{" "}
+          Đã có tài khoản?{' '}
           <a
             href="/login"
             className="text-light-primary font-medium hover:underline"
