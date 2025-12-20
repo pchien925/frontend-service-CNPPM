@@ -3,10 +3,7 @@ import { useForm, FormProvider } from 'react-hook-form';
 import InputField from '../../components/ui/InputField';
 import PasswordField from '../../components/ui/PasswordField';
 import Button from '../../components/ui/Button';
-<<<<<<< HEAD
-=======
 import apiClient from '../../services/apiClient';
->>>>>>> 00469f619241899c2322f7b6b3271717250a49ad
 
 export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
