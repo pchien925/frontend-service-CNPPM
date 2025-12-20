@@ -24,7 +24,6 @@ export default function LoginPage() {
     console.log("Submit data:", data);
 
     try {
-<<<<<<< HEAD
       // Bypass apiClient interceptor và gửi request trực tiếp
       const response = await fetch('https://backend-service-cnppm.onrender.com/api/auth/login', {
         method: 'POST',
@@ -53,19 +52,6 @@ export default function LoginPage() {
     } catch (error) {
       console.error("Login error:", error);
       alert(error.message || "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
-=======
-      const res = await apiClient.post('/api/auth/login', {
-        username: data.username,
-        password: data.password,
-      });
-      const { accessToken, refreshToken, userKind } = res.data;
-
-      login(accessToken, refreshToken, userKind);
-      navigate("/", { replace: true });
-    } catch (error) {
-      console.error("Login error:", error);
-      alert("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.");
->>>>>>> 00469f619241899c2322f7b6b3271717250a49ad
     } finally {
       setLoading(false);
     }
