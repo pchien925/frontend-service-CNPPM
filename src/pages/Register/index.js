@@ -3,6 +3,10 @@ import { useForm, FormProvider } from 'react-hook-form';
 import InputField from '../../components/ui/InputField';
 import PasswordField from '../../components/ui/PasswordField';
 import Button from '../../components/ui/Button';
+<<<<<<< HEAD
+=======
+import apiClient from '../../services/apiClient';
+>>>>>>> 00469f619241899c2322f7b6b3271717250a49ad
 
 export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
@@ -30,6 +34,7 @@ export default function RegisterPage() {
     console.log('Submit data:', data);
 
     try {
+<<<<<<< HEAD
       const payload = {
         kind: data.kind,
         username: data.username,
@@ -67,6 +72,13 @@ export default function RegisterPage() {
     } catch (error) {
       console.error('Register error:', error);
       alert(error.message || 'Đăng ký thất bại. Vui lòng kiểm tra lại thông tin.');
+=======
+      const res = await apiClient.post('/api/auth/register', data);
+      console.log('res', res.data);
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.');
+>>>>>>> 00469f619241899c2322f7b6b3271717250a49ad
     } finally {
       setLoading(false);
     }

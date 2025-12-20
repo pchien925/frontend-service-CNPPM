@@ -14,6 +14,7 @@ export const setCacheToken = (accessToken) => {
 };
 
 export const removeCacheAccessToken = () => removeItem(USER_ACCESS_TOKEN);
+
 export const removeUserKind = () => removeItem(USER_KIND);
 
 export const removeCacheToken = () => {

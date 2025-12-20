@@ -1,3 +1,4 @@
+
 import api from './api';
 
 const apiClient = {
@@ -10,6 +11,7 @@ const apiClient = {
         'Content-Type': 'multipart/form-data',
       };
     }
+<<<<<<< HEAD
     return api.post(url, data, config);
   },
 
