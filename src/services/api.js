@@ -1,38 +1,65 @@
+// src/services/api.js
 import axios from 'axios';
-import { getCacheAccessToken, removeCacheToken } from './userService';
+import {
+  getCacheAccessToken,
+  removeCacheToken,
+} from './userService';
+import { jwtDecode } from 'jwt-decode';
 
-const axiosInstance = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8888',
-  timeout: 10000,
+const BASE_URL = 'https://backend-service-cnppm.onrender.com';
+
+/**
+ * Axios chính cho app
+ */
+const api = axios.create({
+  baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
-    'Cache-Control': 'no-cache',
-    Pragma: 'no-cache',
-    Expires: '0',
   },
 });
 
-axiosInstance.interceptors.request.use(
+/* ============================
+   REQUEST INTERCEPTOR
+============================ */
+api.interceptors.request.use(
   (config) => {
-    const token = getCacheAccessToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const accessToken = getCacheAccessToken();
+
+    if (accessToken) {
+      try {
+        const decoded = jwtDecode(accessToken);
+        const now = Math.floor(Date.now() / 1000);
+
+        //  KHÔNG xoá token ở đây
+        if (decoded?.exp >= now) {
+          config.headers.Authorization = `Bearer ${accessToken}`;
+        }
+      } catch {
+        // token lỗi format
+        removeCacheToken();
+      }
     }
+
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-axiosInstance.interceptors.response.use(
+/* ============================
+   RESPONSE INTERCEPTOR
+============================ */
+api.interceptors.response.use(
   (response) => response.data,
-  (error) => {
+  async (error) => {
+    // Nếu lỗi 401 hoặc không có token, redirect về login
     if (error.response?.status === 401) {
       removeCacheToken();
-      window.location.reload();
+      window.location.href = '/login';
+      return Promise.reject(error);
     }
 
     return Promise.reject(error);
   }
 );
+export default api;
 
-export default axiosInstance;

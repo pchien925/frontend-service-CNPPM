@@ -24,6 +24,7 @@
     "redux-saga": "^1.4.2",
     "sass": "^1.94.1",
     "web-vitals": "^2.1.4",
+    "jwt-decode": "^4.0.0",
     "yup": "^1.7.1"
   },
   "scripts": {

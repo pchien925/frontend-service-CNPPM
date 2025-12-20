@@ -31,11 +31,43 @@ export default function RegisterPage() {
     console.log('Submit data:', data);
 
     try {
-      const res = await apiClient.post('/api/auth/register', data);
-      console.log('res', res.data);
+      const payload = {
+        kind: data.kind,
+        username: data.username,
+        email: data.email,
+        password: data.password,
+        fullName: data.fullName,
+        phone: data.phone || '',
+        avatarPath: data.avatarPath || '',
+        groupId: data.groupId ? String(data.groupId) : undefined,
+      };
+
+      console.log('Sending payload:', payload);
+
+      const response = await fetch('https://backend-service-cnppm.onrender.com/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
+      const res = await response.json();
+      console.log('Response data:', res);
+
+      if (!response.ok) {
+        throw new Error(res.message || 'Đăng ký thất bại');
+      }
+
+      console.log('Register success:', res);
+      alert('Đăng ký thành công! Vui lòng kiểm tra email để xác thực.');
+      window.location.href = '/login';
     } catch (error) {
-      console.error('Login error:', error);
-      alert('Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.');
+      console.error('Register error:', error);
+      alert(error.message || 'Đăng ký thất bại. Vui lòng kiểm tra lại thông tin.');
     } finally {
       setLoading(false);
     }

@@ -1,29 +1,23 @@
 import { storageKeys } from "@constants";
 import { getData, removeItem, setData } from "@utils/localStorage";
 
-const { USER_ACCESS_TOKEN, USER_REFRESH_TOKEN, USER_KIND} = storageKeys;
+const { USER_ACCESS_TOKEN, USER_KIND} = storageKeys;
 
 export const getCacheAccessToken = () => getData(USER_ACCESS_TOKEN);
 
-export const getCacheRefreshToken = () => getData(USER_REFRESH_TOKEN);
-
 export const setCacheAccessToken = (accessToken) => setData(USER_ACCESS_TOKEN, accessToken);
-
-export const setCacheRefreshToken = (refreshToken) => setData(USER_REFRESH_TOKEN, refreshToken);
 
 export const setUserKind = (userKind) => setData(USER_KIND, userKind);
 
-export const setCacheToken = (accessToken, refreshToken) => {
+export const setCacheToken = (accessToken) => {
     setCacheAccessToken(accessToken);
-    setCacheRefreshToken(refreshToken);
 };
 
 export const removeCacheAccessToken = () => removeItem(USER_ACCESS_TOKEN);
-export const removeCacheRefreshToken = () => removeItem(USER_REFRESH_TOKEN);
+
 export const removeUserKind = () => removeItem(USER_KIND);
 
 export const removeCacheToken = () => {
     removeCacheAccessToken();
-    removeCacheRefreshToken();
     removeUserKind();
 };

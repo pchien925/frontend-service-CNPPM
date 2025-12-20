@@ -1,26 +1,36 @@
-import axiosInstance from "../services/api";
+
+import api from './api';
 
 const apiClient = {
-  get: (url, config = {}) => axiosInstance.get(url, config),
-  post: (url, data, config = {}) => {
+  get: (url, config = {}) => api.get(url, config),
+
+  post: (url, data = {}, config = {}) => {
     if (data instanceof FormData) {
       config.headers = {
         ...config.headers,
         'Content-Type': 'multipart/form-data',
       };
     }
-    return axiosInstance.post(url, data, config);
+    return api.post(url, data, config);
   },
-  put: (url, data, config = {}) => axiosInstance.put(url, data, config),
-  patch: (url, data, config = {}) => axiosInstance.patch(url, data, config),
-  delete: (url, config = {}) => axiosInstance.delete(url, config),
 
-  upload: (url, formData, config = {}) => {
-    return axiosInstance.post(url, formData, {
+  put: (url, data = {}, config = {}) =>
+    api.put(url, data, config),
+
+  patch: (url, data = {}, config = {}) =>
+    api.patch(url, data, config),
+
+  delete: (url, config = {}) =>
+    api.delete(url, config),
+
+  upload: (url, formData, config = {}) =>
+    api.post(url, formData, {
       ...config,
-      headers: { 'Content-Type': 'multipart/form-data', ...config.headers },
-    });
-  },
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        ...config.headers,
+      },
+    }),
 };
 
 export default apiClient;

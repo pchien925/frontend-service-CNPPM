@@ -27,8 +27,8 @@ const useAuth = () => {
   }, [token, user, isAuthenticated, dispatch]);
 
   // Hàm login: lưu token + gọi fetch profile
-  const login = useCallback((accessToken, refreshToken, userKind) => {
-    setCacheToken(accessToken, refreshToken);
+  const login = useCallback((accessToken, userKind) => {
+    setCacheToken(accessToken);
     if (userKind) {
       // nếu backend trả thêm userKind
       // setUserKind(userKind);
