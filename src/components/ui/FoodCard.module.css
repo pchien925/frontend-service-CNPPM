@@ -1,0 +1,239 @@
+/* src/components/ui/FoodCard.module.css */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  height: 100%;
+  position: relative;
+}
+
+.card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+/* Featured variant - lớn hơn, nổi bật hơn */
+.featured {
+  grid-column: span 2;
+  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.15);
+}
+
+.featured:hover {
+  box-shadow: 0 8px 20px rgba(255, 77, 79, 0.2);
+}
+
+.featured .imageContainer {
+  padding-bottom: 60%; /* taller aspect ratio */
+}
+
+.featured .content {
+  padding: 16px;
+}
+
+.featured .name {
+  font-size: 16px;
+  -webkit-line-clamp: 3;
+}
+
+/* Shift tags down when bestseller badge exists */
+.card:has(.bestsellerBadge) .tagContainer {
+  top: 44px;
+}
+
+/* Bestseller Badge */
+.bestsellerBadge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 20;
+  padding: 8px 14px;
+  background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.4);
+  animation: pulse 2s infinite;
+  border: 2px solid white;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(255, 77, 79, 0.4);
+  }
+  50% {
+    box-shadow: 0 6px 16px rgba(255, 77, 79, 0.6);
+  }
+}
+
+.imageContainer {
+  position: relative;
+  width: 100%;
+  padding-bottom: 75%; /* Aspect ratio 4:3 */
+  overflow: hidden;
+  background: linear-gradient(135deg, #f5f5f5 0%, #f0f0f0 100%);
+}
+
+.image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tagContainer {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  max-width: calc(100% - 16px);
+  align-content: flex-start;
+  padding-right: 8px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+  border-radius: 4px;
+  background-color: #ff4d4f;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.cookingTime {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-size: 12px;
+  border-radius: 6px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 12px;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 6px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.category {
+  font-size: 12px;
+  color: #999;
+  margin: 0 0 6px 0;
+}
+
+.description {
+  font-size: 12px;
+  color: #666;
+  margin: 0 0 auto 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.price {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ff4d4f;
+  letter-spacing: -0.3px;
+}
+
+.addBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #ff4d4f 0%, #ff6b6b 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 600;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(255, 77, 79, 0.2);
+}
+
+.addBtn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 4px 8px rgba(255, 77, 79, 0.3);
+}
+
+.addBtn:active {
+  transform: scale(0.95);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .card {
+    border-radius: 8px;
+  }
+
+  .content {
+    padding: 10px;
+  }
+
+  .name {
+    font-size: 13px;
+  }
+
+  .price {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .content {
+    padding: 8px;
+  }
+
+  .name {
+    font-size: 12px;
+    -webkit-line-clamp: 2;
+  }
+
+  .tag {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+}

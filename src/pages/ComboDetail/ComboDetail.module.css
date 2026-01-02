@@ -1,0 +1,316 @@
+/* src/pages/ComboDetail/ComboDetail.module.css */
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px 16px 16px;
+  min-height: calc(100vh - 100px);
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 24px;
+}
+
+.backBtn:hover {
+  background: #f0f0f0;
+  border-color: #999;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+/* Image Section */
+.imageSection {
+  position: sticky;
+  top: 80px;
+}
+
+.imageWrapper {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.image {
+  width: 100%;
+  border-radius: 12px;
+  object-fit: cover;
+  aspect-ratio: 1;
+  background: #f0f0f0;
+  display: block;
+}
+
+.comboBadge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 8px 14px;
+  background: #fa8c16;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Info Section */
+.infoSection {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.header {
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 8px 0;
+  word-wrap: break-word;
+}
+
+.category {
+  font-size: 16px;
+  color: #999;
+  margin: 0;
+}
+
+/* Meta Info */
+.metaInfo {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 16px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  color: #333;
+}
+
+.price {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ff4d4f;
+}
+
+/* Tags */
+.tagBadges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px 0;
+}
+
+.tagBadge {
+  display: inline-block;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  border-radius: 6px;
+  background-color: #ff4d4f;
+}
+
+/* Description Block */
+.descriptionBlock {
+  padding: 16px 0;
+}
+
+.descriptionBlock h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 8px 0;
+}
+
+.descriptionBlock p {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-line;
+}
+
+.benefitsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.benefitsList li {
+  font-size: 14px;
+  color: #666;
+  padding: 8px 0;
+  padding-left: 24px;
+  position: relative;
+  line-height: 1.5;
+}
+
+.benefitsList li:before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #52c41a;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* Loading & Error */
+.loadingContainer,
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
+  text-align: center;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  color: #ff4d4f;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.errorContainer h2 {
+  font-size: 24px;
+  margin: 0;
+  color: #ff4d4f;
+}
+
+.errorContainer p {
+  margin: 8px 0;
+  color: #666;
+}
+
+.retryBtn {
+  padding: 10px 24px;
+  background: #ff4d4f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.retryBtn:hover {
+  background: #ff7875;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .content {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .imageSection {
+    position: static;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .price {
+    font-size: 20px;
+  }
+
+  .metaInfo {
+    gap: 16px;
+  }
+
+  .descriptionBlock h3 {
+    font-size: 14px;
+  }
+
+  .descriptionBlock p {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 12px;
+  }
+
+  .backBtn {
+    margin-bottom: 16px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+
+  .category {
+    font-size: 14px;
+  }
+
+  .price {
+    font-size: 18px;
+  }
+
+  .metaInfo {
+    gap: 12px;
+  }
+
+  .metaItem {
+    font-size: 14px;
+  }
+
+  .infoSection {
+    gap: 16px;
+  }
+
+  .tagBadges {
+    gap: 6px;
+  }
+
+  .tagBadge {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+}
