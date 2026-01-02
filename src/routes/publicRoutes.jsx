@@ -9,12 +9,6 @@ import FoodDetailPage from "../pages/FoodDetail";
 import ProductsPage from "../pages/Products";
 import ComboDetailPage from "../pages/ComboDetail";
 import AboutPage from '../pages/About';
-import ForgotPasswordPage from '../pages/ForgotPassword';
-import HomePage from '../pages/Home';
-import LoginPage from '../pages/Login';
-import NotFoundPage from '../pages/NotFound';
-import RegisterPage from '../pages/Register';
-import ResetPasswordPage from '../pages/ResetPassword';
 
 export const publicRoutes = [
   { path: '/', element: <HomePage /> },

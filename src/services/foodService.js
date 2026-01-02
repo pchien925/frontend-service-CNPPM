@@ -1,5 +1,5 @@
 // src/services/foodService.js
-import api from './api';
+import apiClient from './apiClient';
 
 const FOOD_API = '/api/food';
 
@@ -9,18 +9,13 @@ const FOOD_API = '/api/food';
  * @param {number} limit - Số lượng trên trang (mặc định 20)
  * @returns {Promise}
  */
-export const getFoodList = async (page = 0, limit = 20) => {
-  try {
-    const response = await api.get(`${FOOD_API}/list`, {
-      params: {
-        page,
-        limit,
-      },
-    });
-    return response;
-  } catch (error) {
-    throw error;
-  }
+export const getFoodList = (page = 0, limit = 20) => {
+  return apiClient.get(`${FOOD_API}/list`, {
+    params: {
+      page,
+      limit,
+    },
+  });
 };
 
 /**
@@ -28,29 +23,13 @@ export const getFoodList = async (page = 0, limit = 20) => {
  * @param {string} foodId - ID của món ăn
  * @returns {Promise}
  */
-export const getFoodDetail = async (foodId) => {
-  try {
-    const response = await api.get(`${FOOD_API}/get/${foodId}`);
-    return response;
-  } catch (error) {
-    throw error;
-  }
+export const getFoodDetail = (foodId) => {
+  return apiClient.get(`${FOOD_API}/get/${encodeURIComponent(foodId)}`);
 };
-
-export default {
-  getFoodList,
-  getFoodDetail,
-};
-import apiClient from './apiClient';
 
 const foodService = {
-  getFoodList: (params = {}) => {
-    return apiClient.get('/api/food/list', { params });
-  },
-
-  getFoodById: (id) => {
-    return apiClient.get(`/api/food/get/${encodeURIComponent(id)}`);
-  },
+  getFoodList,
+  getFoodDetail,
 };
 
 export default foodService;
