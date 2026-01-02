@@ -3,20 +3,16 @@ import { useForm, FormProvider } from 'react-hook-form';
 import InputField from '../../components/ui/InputField';
 import PasswordField from '../../components/ui/PasswordField';
 import Button from '../../components/ui/Button';
-import apiClient from '../../services/apiClient';
 
 export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
 
   const defaultValues = {
-    kind: 0,
     username: '',
     email: '',
     password: '',
     fullName: '',
     phone: '',
-    avatarPath: '',
-    groupId: 16,
   };
 
   const methods = useForm({ defaultValues });
@@ -26,52 +22,6 @@ export default function RegisterPage() {
     formState: { errors },
   } = methods;
 
-  const onSubmit = async (data) => {
-    setLoading(true);
-    console.log('Submit data:', data);
-
-    try {
-      const payload = {
-        kind: data.kind,
-        username: data.username,
-        email: data.email,
-        password: data.password,
-        fullName: data.fullName,
-        phone: data.phone || '',
-        avatarPath: data.avatarPath || '',
-        groupId: data.groupId ? String(data.groupId) : undefined,
-      };
-
-      console.log('Sending payload:', payload);
-
-      const response = await fetch('https://backend-service-cnppm.onrender.com/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      console.log('Response status:', response.status);
-      console.log('Response ok:', response.ok);
-
-      const res = await response.json();
-      console.log('Response data:', res);
-
-      if (!response.ok) {
-        throw new Error(res.message || 'Đăng ký thất bại');
-      }
-
-      console.log('Register success:', res);
-      alert('Đăng ký thành công! Vui lòng kiểm tra email để xác thực.');
-      window.location.href = '/login';
-    } catch (error) {
-      console.error('Register error:', error);
-      alert(error.message || 'Đăng ký thất bại. Vui lòng kiểm tra lại thông tin.');
-    } finally {
-      setLoading(false);
-    }
-  };
   return (
     <div className="min-h-screen flex items-center justify-center bg-light-primary/10 p-4">
       <div className="w-full max-w-lg bg-white p-8 rounded-2xl shadow-xl">
@@ -80,10 +30,7 @@ export default function RegisterPage() {
         </h2>
 
         <FormProvider {...methods}>
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-3"
-          >
+          <form className="flex flex-col gap-3">
             <InputField
               label="Tên đăng nhập"
               placeholder="Nhập tên đăng nhập"
@@ -155,6 +102,7 @@ export default function RegisterPage() {
             </Button>
           </form>
         </FormProvider>
+
         <p className="mt-3 text-center text-sm text-gray-500">
           Đã có tài khoản?{' '}
           <a
