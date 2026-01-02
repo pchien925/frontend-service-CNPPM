@@ -1,0 +1,354 @@
+/* src/components/ui/OrderSection.module.css */
+
+.orderSection {
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+/* Option Groups */
+.optionGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.groupTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.required {
+  color: #ff4d4f;
+  margin-left: 4px;
+}
+
+/* Single Option */
+.option {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.optionName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.selectCount {
+  font-size: 12px;
+  font-weight: 400;
+  color: #999;
+}
+
+.optionDescription {
+  font-size: 12px;
+  color: #999;
+  margin: 0;
+}
+
+.optionValues {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.optionValue {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.optionValue:hover {
+  background: #f9f9f9;
+  border-color: #ff4d4f;
+}
+
+.optionValue input[type='radio'],
+.optionValue input[type='checkbox'] {
+  cursor: pointer;
+}
+
+.optionValueLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  cursor: pointer;
+  font-size: 13px;
+  color: #333;
+}
+
+.optionValuePrice {
+  font-size: 12px;
+  color: #ff4d4f;
+  font-weight: 600;
+}
+
+/* Quantity Section */
+.quantitySection {
+  padding: 16px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.quantityControl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f9f9f9;
+  border-radius: 6px;
+  padding: 0;
+  width: fit-content;
+}
+
+.quantityBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.quantityBtn:hover {
+  color: #ff4d4f;
+  background: #f0f0f0;
+}
+
+.quantityBtn:active {
+  background: #e0e0e0;
+}
+
+.quantityInput {
+  width: 60px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.quantityInput:focus {
+  outline: none;
+}
+
+/* Price Block */
+.priceBlock {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #fafafa;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #666;
+}
+
+.totalPrice {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ff4d4f;
+}
+
+/* Message */
+.message {
+  padding: 12px;
+  background: #f6ffed;
+  border: 1px solid #b7eb8f;
+  border-radius: 6px;
+  color: #274e09;
+  font-size: 13px;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Button Group */
+.buttonGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.addToCartBtn,
+.orderBtn {
+  padding: 12px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.addToCartBtn {
+  background: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.addToCartBtn:hover {
+  background: #e0e0e0;
+  border-color: #999;
+}
+
+.orderBtn {
+  background: #ff4d4f;
+  color: white;
+}
+
+.orderBtn:hover {
+  background: #ff7875;
+}
+
+.orderBtn:active {
+  transform: scale(0.98);
+}
+
+/* Note */
+.note {
+  font-size: 12px;
+  color: #999;
+  margin: 0;
+  padding: 12px;
+  background: #fafafa;
+  border-radius: 6px;
+  border-left: 3px solid #ff4d4f;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .orderSection {
+    padding: 16px;
+  }
+
+  .title {
+    font-size: 16px;
+  }
+
+  .groupTitle {
+    font-size: 13px;
+  }
+
+  .optionName {
+    font-size: 13px;
+  }
+
+  .optionDescription {
+    font-size: 11px;
+  }
+
+  .buttonGroup {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .addToCartBtn,
+  .orderBtn {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .totalPrice {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .orderSection {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .title {
+    font-size: 14px;
+  }
+
+  .optionGroup {
+    gap: 8px;
+    padding: 12px 0;
+  }
+
+  .groupTitle {
+    font-size: 12px;
+  }
+
+  .optionName {
+    font-size: 12px;
+  }
+
+  .quantityControl {
+    width: 100%;
+  }
+
+  .quantityBtn {
+    flex: 1;
+    height: 36px;
+  }
+
+  .quantityInput {
+    height: 36px;
+  }
+
+  .buttonGroup {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .addToCartBtn,
+  .orderBtn {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .totalPrice {
+    font-size: 16px;
+  }
+
+  .message {
+    font-size: 12px;
+    padding: 10px;
+  }
+
+  .note {
+    font-size: 11px;
+    padding: 10px;
+  }
+}
