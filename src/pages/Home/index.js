@@ -81,50 +81,33 @@ const DEMO_FOODS = [
   },
 ];
 
-// parse list từ nhiều cấu trúc response
-const extractFoodList = (res) => {
-  const d = res?.data;
-  const candidates = [
-    d?.data,
-    d?.items,
-    d?.data?.items,
-    d?.data?.data,
-    d?.data?.data?.items,
-    d,
-  ];
-  for (const c of candidates) if (Array.isArray(c)) return c;
-  if (Array.isArray(d?.rows)) return d.rows;
-  if (Array.isArray(d?.results)) return d.results;
-  return [];
-};
-
 const HomePage = () => {
   const [foods, setFoods] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const [query, setQuery] = useState('');
 
   const fetchFoods = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-
-      const response = await foodService.getFoodList({
+      const list = await foodService.getFoodList({
         limit: 6,
         page: 1,
         status: 1,
       });
 
-      const list = extractFoodList(response);
+      console.log('Food list:', list);
 
       if (Array.isArray(list) && list.length > 0) {
         setFoods(list.slice(0, 6));
       } else {
-        setError('API không trả danh sách món. Hiển thị dữ liệu mẫu.');
         setFoods(DEMO_FOODS);
+        setError('API không trả danh sách món. Hiển thị dữ liệu mẫu.');
       }
     } catch (err) {
+      console.error('API Error:', err);
+
       const status = err?.response?.status;
       const msg =
         err?.response?.data?.message ||
@@ -147,6 +130,7 @@ const HomePage = () => {
   const filteredFoods = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return foods;
+
     return foods.filter((f) => {
       const name = (f?.name || '').toLowerCase();
       const desc = (f?.description || '').toLowerCase();
@@ -168,7 +152,7 @@ const HomePage = () => {
       {/* HERO (bo góc banner) */}
       <section className="py-6 sm:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative overflow-hidden rounded-3xl">
+          <div className="relative overflow-hidden rounded-3xl border border-white/20 shadow-xl">
             <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500" />
             <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-white/10 blur-2xl" />
             <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-white/10 blur-2xl" />
@@ -199,6 +183,7 @@ const HomePage = () => {
                       Khám phá thực đơn
                     </Link>
                     <button
+                      type="button"
                       onClick={fetchFoods}
                       className="inline-flex items-center justify-center px-6 py-3 rounded-2xl bg-white/10 text-white border border-white/25 font-semibold hover:bg-white/15 transition"
                     >
@@ -206,7 +191,6 @@ const HomePage = () => {
                     </button>
                   </div>
 
-                  {/* Search */}
                   <div className="mt-8">
                     <div className="relative">
                       <input
@@ -222,7 +206,6 @@ const HomePage = () => {
                   </div>
                 </div>
 
-                {/* Right card */}
                 <div className="bg-white/95 rounded-3xl shadow-xl p-6 border border-white/60">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-bold text-gray-900">
@@ -288,6 +271,7 @@ const HomePage = () => {
                 Xem toàn bộ
               </Link>
               <button
+                type="button"
                 onClick={() => setQuery('')}
                 className="inline-flex items-center justify-center px-5 py-2.5 rounded-2xl bg-white border border-gray-200 text-gray-800 font-semibold hover:bg-gray-50 transition"
               >
@@ -296,7 +280,6 @@ const HomePage = () => {
             </div>
           </div>
 
-          {/* Error */}
           {error && (
             <div className="mb-8 rounded-2xl border border-yellow-200 bg-yellow-50 p-4 text-yellow-800">
               <div className="flex items-start justify-between gap-3">
@@ -305,6 +288,7 @@ const HomePage = () => {
                   <p className="text-sm mt-1 opacity-90">{error}</p>
                 </div>
                 <button
+                  type="button"
                   onClick={fetchFoods}
                   className="shrink-0 px-4 py-2 rounded-xl bg-yellow-100 hover:bg-yellow-200 border border-yellow-200 font-semibold transition"
                 >
@@ -314,7 +298,6 @@ const HomePage = () => {
             </div>
           )}
 
-          {/* Grid */}
           {filteredFoods.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredFoods.slice(0, 6).map((food) => (

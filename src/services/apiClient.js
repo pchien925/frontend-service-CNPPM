@@ -1,4 +1,3 @@
-
 import api from './api';
 
 const apiClient = {
@@ -14,14 +13,11 @@ const apiClient = {
     return api.post(url, data, config);
   },
 
-  put: (url, data = {}, config = {}) =>
-    api.put(url, data, config),
+  put: (url, data = {}, config = {}) => api.put(url, data, config),
 
-  patch: (url, data = {}, config = {}) =>
-    api.patch(url, data, config),
+  patch: (url, data = {}, config = {}) => api.patch(url, data, config),
 
-  delete: (url, config = {}) =>
-    api.delete(url, config),
+  delete: (url, config = {}) => api.delete(url, config),
 
   upload: (url, formData, config = {}) =>
     api.post(url, formData, {

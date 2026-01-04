@@ -1,13 +1,39 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+
+const IMG_BASE = 'https://ute-food-cms.onrender.com';
+
+//fallback không cần mạng
+const FALLBACK_IMG =
+  'data:image/svg+xml;utf8,' +
+  encodeURIComponent(`
+  <svg xmlns="http://www.w3.org/2000/svg" width="400" height="300">
+    <rect width="100%" height="100%" fill="#f3f4f6"/>
+    <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle"
+      fill="#6b7280" font-family="Arial" font-size="18">
+      Food Image
+    </text>
+  </svg>
+`);
+
+const resolveImageUrl = (url) => {
+  if (!url || url === 'string') return null;
+  if (/^https?:\/\//i.test(url)) return url; // đã absolute
+  const path = url.startsWith('/') ? url : `/${url}`;
+  return `${IMG_BASE}${path}`;
+};
 
 const FoodCard = ({ food, onOrder }) => {
+  const imgSrc = useMemo(() => {
+    const full = resolveImageUrl(food?.imageUrl);
+    return full || FALLBACK_IMG;
+  }, [food?.imageUrl]);
+
   if (!food) return null;
 
   const {
     name = 'Không có tên',
     description,
     basePrice,
-    imageUrl,
     category,
     tags,
     cookingTime,
@@ -32,16 +58,24 @@ const FoodCard = ({ food, onOrder }) => {
       ? 'Liên hệ'
       : `${priceNumber.toLocaleString('vi-VN')}đ`;
 
+  const timeNumber = (() => {
+    const n = Number(cookingTime);
+    return Number.isFinite(n) ? n : null;
+  })();
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-      <div className="relative h-48 overflow-hidden">
+      <div className="relative h-48 overflow-hidden bg-gradient-to-br from-orange-100 to-orange-200">
         <img
-          src={
-            imageUrl || 'https://via.placeholder.com/400x300?text=Food+Image'
-          }
+          src={imgSrc}
           alt={name}
-          className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
           loading="lazy"
+          className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+          onError={(e) => {
+            if (e.currentTarget.src !== FALLBACK_IMG) {
+              e.currentTarget.src = FALLBACK_IMG;
+            }
+          }}
         />
 
         {categoryLabel && (
@@ -50,9 +84,9 @@ const FoodCard = ({ food, onOrder }) => {
           </span>
         )}
 
-        {typeof cookingTime === 'number' && (
+        {timeNumber !== null && (
           <span className="absolute top-2 left-2 bg-gray-800 bg-opacity-75 text-white px-2 py-1 rounded text-xs">
-            🕐 {cookingTime} phút
+            🕐 {timeNumber} phút
           </span>
         )}
       </div>
@@ -95,6 +129,7 @@ const FoodCard = ({ food, onOrder }) => {
           </span>
 
           <button
+            type="button"
             onClick={() => onOrder?.(food)}
             className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors duration-300"
           >
