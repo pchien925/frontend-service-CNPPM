@@ -11,7 +11,7 @@ const FOOD_API = '/api/food';
  */
 export const getFoodList = async (page = 0, limit = 20) => {
   try {
-    const response = await api.get(`${FOOD_API}/list`, {
+    const response = await api.get(`${FOOD_API}/public-list`, {
       params: {
         page,
         limit,

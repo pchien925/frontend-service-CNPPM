@@ -16,10 +16,6 @@ export default function FoodsPage() {
     totalElements: 0,
   });
 
-  useEffect(() => {
-    fetchFoods();
-  }, []);
-
   const fetchFoods = async (page = 0) => {
     try {
       setLoading(true);
@@ -43,6 +39,11 @@ export default function FoodsPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchFoods();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handlePageChange = (page) => {
     if (page >= 0 && page < pagination.totalPages) {
