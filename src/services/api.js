@@ -1,9 +1,6 @@
 // src/services/api.js
 import axios from 'axios';
-import {
-  getCacheAccessToken,
-  removeCacheToken,
-} from './userService';
+import { getCacheAccessToken, removeCacheToken } from './userService';
 import { jwtDecode } from 'jwt-decode';
 
 const BASE_URL = 'https://backend-service-cnppm.onrender.com';
@@ -43,24 +40,47 @@ api.interceptors.request.use(
 
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 /* ============================
    RESPONSE INTERCEPTOR
 ============================ */
+// api.interceptors.response.use(
+//   (response) => response.data,
+//   async (error) => {
+//     // Nếu lỗi 401 hoặc không có token, redirect về login
+//     if (error.response?.status === 401) {
+//       removeCacheToken();
+//       window.location.href = '/login';
+//       return Promise.reject(error);
+//     }
+
+//     return Promise.reject(error);
+//   },
+// );
+// export default api;
 api.interceptors.response.use(
   (response) => response.data,
   async (error) => {
-    // Nếu lỗi 401 hoặc không có token, redirect về login
-    if (error.response?.status === 401) {
+    if (error?.response?.status === 401) {
       removeCacheToken();
-      window.location.href = '/login';
+
+      const url = error?.config?.url || '';
+      const isPublic =
+        url.includes('/public') ||
+        url.includes('/public-') ||
+        url.includes('/public_');
+
+      if (!isPublic) {
+        window.location.href = '/login';
+      }
+
       return Promise.reject(error);
     }
 
     return Promise.reject(error);
-  }
+  },
 );
-export default api;
 
+export default api;
