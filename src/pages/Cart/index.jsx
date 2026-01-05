@@ -1,7 +1,8 @@
 // src/pages/Cart/index.jsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useCart from '../../hooks/useCart';
+import { getFoodDetail } from '../../services/foodService';
 import { Trash2, Plus, Minus, ShoppingCart, AlertCircle } from 'lucide-react';
 import './Cart.scss';
 
@@ -20,13 +21,37 @@ const CartPage = () => {
     resetError,
   } = useCart();
 
-  // Reset error sau 3 giây
+  const [itemDetails, setItemDetails] = useState({});
+
+  // Fetch tên sản phẩm từ API
   useEffect(() => {
-    if (error || success) {
-      const timer = setTimeout(resetError, 3000);
-      return () => clearTimeout(timer);
+    const fetchItemDetails = async () => {
+      const uniqueItemIds = [...new Set(items.map(item => item.itemId))];
+      
+      for (const itemId of uniqueItemIds) {
+        if (!itemDetails[itemId]) {
+          try {
+            const response = await getFoodDetail(itemId);
+            const foodData = response.data || response;
+            setItemDetails(prev => ({
+              ...prev,
+              [itemId]: foodData.name || `Food #${itemId}`
+            }));
+          } catch (err) {
+            console.error(`Failed to fetch food ${itemId}:`, err);
+            setItemDetails(prev => ({
+              ...prev,
+              [itemId]: `Food #${itemId}`
+            }));
+          }
+        }
+      }
+    };
+
+    if (items.length > 0) {
+      fetchItemDetails();
     }
-  }, [error, success, resetError]);
+  }, [items, itemDetails]);
 
   const handleQuantityChange = (cartItemId, newQuantity) => {
     if (newQuantity <= 0) {
@@ -47,6 +72,15 @@ const CartPage = () => {
     if (!isEmpty) {
       navigate('/checkout');
     }
+  };
+
+  const formatPrice = (price) => {
+    const numPrice = typeof price === 'string' ? parseFloat(price) : price;
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+      minimumFractionDigits: 0,
+    }).format(numPrice);
   };
 
   const calculateItemPrice = (item) => {
@@ -121,7 +155,10 @@ const CartPage = () => {
                 <div key={item.id} className="cart-item">
                   <div className="col-product">
                     <div className="item-details">
-                      <h3>{item.itemKind === 1 ? 'Food' : 'Combo'} #{item.itemId}</h3>
+                      <h3>
+                        {itemDetails[item.itemId] || `Loading...`}
+                        {item.itemKind === 2 && ' (Combo)'}
+                      </h3>
                       {item.note && (
                         <p className="item-note">
                           <span>Note:</span> {item.note}
@@ -155,7 +192,7 @@ const CartPage = () => {
                   </div>
 
                   <div className="col-price">
-                    <span>${Number(item.basePrice).toFixed(2)}</span>
+                    <span>{formatPrice(item.basePrice)}</span>
                   </div>
 
                   <div className="col-quantity">
@@ -195,7 +232,7 @@ const CartPage = () => {
 
                   <div className="col-total">
                     <span className="price-total">
-                      ${calculateItemPrice(item).toFixed(2)}
+                      {formatPrice(calculateItemPrice(item))}
                     </span>
                   </div>
 
@@ -218,7 +255,7 @@ const CartPage = () => {
               <div className="summary-section">
                 <div className="summary-row">
                   <span>Subtotal:</span>
-                  <span>${totalPrice.toFixed(2)}</span>
+                  <span>{formatPrice(totalPrice)}</span>
                 </div>
                 <div className="summary-row">
                   <span>Shipping:</span>
@@ -226,7 +263,7 @@ const CartPage = () => {
                 </div>
                 <div className="summary-row total">
                   <span>Total:</span>
-                  <span>${totalPrice.toFixed(2)}</span>
+                  <span>{formatPrice(totalPrice)}</span>
                 </div>
               </div>
 

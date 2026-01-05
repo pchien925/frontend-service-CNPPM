@@ -80,25 +80,28 @@ export default function OrderSection({ product, food, foodOptions = [], type = '
       return;
     }
 
-    const orderData = {
-      foodId: item.id,
-      foodName: item.name,
-      quantity,
-      basePrice: item.basePrice,
-      totalPrice: item.basePrice * quantity,
-      selectedOptions: Object.entries(selectedOptions).map(([optionId, values]) => ({
-        optionId,
-        values,
-      })),
-      timestamp: new Date().toISOString(),
+    // Payload phải match với API requirement
+    const cartPayload = {
+      itemId: String(item.id),           // ✅ Phải là string
+      itemKind: 1,                       // ✅ 1 = Food, 2 = Combo
+      quantity: Math.max(1, quantity),
+      note: orderMessage.trim() || undefined,
+      // optionIds: [...] sẽ được thêm khi có option values
     };
 
-    console.log('Order Data:', orderData);
+    console.log('🛒 Add to Cart Payload:', cartPayload);
     
     // Dispatch to Redux
-    dispatch(addToCart(orderData));
+    dispatch(addToCart(cartPayload));
     
     setOrderMessage(`✅ Đã thêm ${quantity} ${item.name} vào giỏ hàng`);
+
+    // Reset form sau 2s
+    setTimeout(() => {
+      setOrderMessage('');
+      setQuantity(1);
+      setSelectedOptions({});
+    }, 2000);
   };
 
   // Xử lý thêm vào giỏ hàng (tương tự)

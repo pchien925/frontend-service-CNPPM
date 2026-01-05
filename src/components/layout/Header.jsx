@@ -10,14 +10,18 @@ import {
   Home,
   ShoppingBag,
   Info,
+  ShoppingCart,
 } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
+import useCart from '../../hooks/useCart';
 
 const Header = () => {
   const { user, logout } = useAuth();
+  const { items } = useCart();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const cartCount = items?.length || 0;
 
   const handleLogout = () => {
     logout();
@@ -53,6 +57,21 @@ const Header = () => {
 
           {/* User Menu */}
           <div className="flex items-center space-x-4">
+            {/* Cart Button */}
+            {user && (
+              <Link
+                to="/cart"
+                className="relative text-white hover:opacity-80 transition p-2 rounded-lg hover:bg-white/10"
+              >
+                <ShoppingCart className="w-6 h-6" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </span>
+                )}
+              </Link>
+            )}
+
             {user ? (
               <div className="relative">
                 <button
@@ -151,6 +170,14 @@ const Header = () => {
               label="Về chúng tôi"
               setOpen={setMobileMenuOpen}
             />
+            {user && (
+              <MobileNavLink
+                to="/cart"
+                icon={ShoppingCart}
+                label={`Giỏ hàng (${cartCount})`}
+                setOpen={setMobileMenuOpen}
+              />
+            )}
           </div>
         )}
       </div>
