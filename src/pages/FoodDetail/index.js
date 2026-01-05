@@ -1,7 +1,7 @@
 // src/pages/FoodDetail/index.js
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getFoodDetail } from '../../services/foodService';
+import { getFoodDetail, getFoodOptions } from '../../services/foodService';
 import OrderSection from '../../components/ui/OrderSection';
 import { buildImageUrl } from '../../utils/imageUrl';
 import { ArrowLeft, Loader, AlertCircle, Clock } from 'lucide-react';
@@ -11,6 +11,7 @@ export default function FoodDetailPage() {
   const { foodId } = useParams();
   const navigate = useNavigate();
   const [food, setFood] = useState(null);
+  const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -22,11 +23,22 @@ export default function FoodDetailPage() {
     try {
       setLoading(true);
       setError(null);
-      const response = await getFoodDetail(foodId);
       
-      // API trả về { data: {...} }
-      const foodData = response.data || response;
+      // Lấy thông tin món ăn
+      const foodResponse = await getFoodDetail(foodId);
+      const foodData = foodResponse.data || foodResponse;
       setFood(foodData);
+      
+      // Lấy danh sách tùy chọn của món ăn
+      try {
+        const optionsResponse = await getFoodOptions(foodId);
+        const optionsData = optionsResponse?.data?.content || optionsResponse?.content || [];
+        setOptions(optionsData);
+        console.log('✅ Loaded options:', optionsData);
+      } catch (optErr) {
+        console.warn('Cảnh báo: Không thể tải tùy chọn:', optErr);
+        setOptions([]);
+      }
     } catch (err) {
       console.error('Lỗi tải chi tiết món ăn:', err);
       setError(err.response?.data?.message || 'Không thể tải chi tiết món ăn');
@@ -169,7 +181,7 @@ export default function FoodDetailPage() {
           )}
 
           {/* Order Section */}
-          <OrderSection food={food} />
+          <OrderSection food={food} foodOptions={options} />
         </div>
       </div>
     </div>

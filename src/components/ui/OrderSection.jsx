@@ -5,7 +5,7 @@ import { Plus, Minus, ShoppingCart } from 'lucide-react';
 import { addToCart } from '../../store/actions/cartAction';
 import styles from './OrderSection.module.css';
 
-export default function OrderSection({ product, food, type = 'food' }) {
+export default function OrderSection({ product, food, foodOptions = [], type = 'food' }) {
   // Support both 'product' và 'food' props for flexibility
   const item = product || food;
   const dispatch = useDispatch();
@@ -13,11 +13,14 @@ export default function OrderSection({ product, food, type = 'food' }) {
   const [selectedOptions, setSelectedOptions] = useState({});
   const [orderMessage, setOrderMessage] = useState('');
 
+  // Sử dụng foodOptions từ prop hoặc từ item.options
+  const options = foodOptions && foodOptions.length > 0 ? foodOptions : (item?.options || []);
+
   // Nhóm options theo requirementType
-  const requiredOptions = item.options?.filter(
+  const requiredOptions = options?.filter(
     (opt) => opt.requirementType === 1
   ) || [];
-  const optionalOptions = item.options?.filter(
+  const optionalOptions = options?.filter(
     (opt) => opt.requirementType === 0
   ) || [];
 
@@ -132,18 +135,17 @@ export default function OrderSection({ product, food, type = 'food' }) {
           {requiredOptions.map((foodOption) => (
             <div key={foodOption.id} className={styles.option}>
               <label className={styles.optionName}>
-                {foodOption.option.name}
+                {foodOption.option?.name}
                 <span className={styles.required}>*</span>
               </label>
               <p className={styles.optionDescription}>
-                {foodOption.option.description}
+                {foodOption.option?.description}
               </p>
 
               {/* Radio buttons (single select) */}
               <div className={styles.optionValues}>
-                {/* Placeholder - thực tế cần fetch option values từ API */}
                 <p className={styles.note}>
-                  Vui lòng cập nhật danh sách giá trị từ API
+                  ⏳ Tùy chọn này chưa có giá trị. Vui lòng chọn trong thực đơn.
                 </p>
               </div>
             </div>
@@ -158,7 +160,7 @@ export default function OrderSection({ product, food, type = 'food' }) {
           {optionalOptions.map((foodOption) => (
             <div key={foodOption.id} className={styles.option}>
               <label className={styles.optionName}>
-                {foodOption.option.name}
+                {foodOption.option?.name}
                 {foodOption.maxSelect > 1 && (
                   <span className={styles.selectCount}>
                     (Tối đa {foodOption.maxSelect})
@@ -166,13 +168,13 @@ export default function OrderSection({ product, food, type = 'food' }) {
                 )}
               </label>
               <p className={styles.optionDescription}>
-                {foodOption.option.description}
+                {foodOption.option?.description}
               </p>
 
               {/* Checkboxes (multiple select) */}
               <div className={styles.optionValues}>
                 <p className={styles.note}>
-                  Vui lòng cập nhật danh sách giá trị từ API
+                  ⏳ Tùy chọn này chưa có giá trị. Vui lòng chọn trong thực đơn.
                 </p>
               </div>
             </div>

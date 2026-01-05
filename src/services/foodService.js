@@ -37,7 +37,30 @@ export const getFoodDetail = async (foodId) => {
   }
 };
 
+/**
+ * Lấy danh sách tùy chọn (options) của một món ăn
+ * @param {string} foodId - ID của món ăn
+ * @param {number} page - Trang (mặc định 0)
+ * @param {number} limit - Số lượng trên trang (mặc định 20)
+ * @returns {Promise}
+ */
+export const getFoodOptions = async (foodId, page = 0, limit = 20) => {
+  try {
+    const response = await api.get('/api/food-option/list', {
+      params: {
+        foodId,
+        page,
+        limit,
+      },
+    });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export default {
   getFoodList,
   getFoodDetail,
+  getFoodOptions,
 };
