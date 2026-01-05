@@ -12,7 +12,7 @@ function* fetchCartSaga() {
     const response = yield call(cartService.getMyCart);
     yield put({
       type: cartActions.SET_CART,
-      payload: response || {},
+      payload: response.data || {},
     });
   } catch (error) {
     console.error('Failed to fetch cart:', error);
