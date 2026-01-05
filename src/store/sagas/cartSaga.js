@@ -28,15 +28,19 @@ function* fetchCartSaga() {
  */
 function* addToCartSaga(action) {
   try {
-    yield put({ type: cartActions.ADD_TO_CART_REQUEST });
     const response = yield call(cartService.addToCart, action.payload);
+
     yield put({
       type: cartActions.ADD_TO_CART_SUCCESS,
       payload: response || {},
     });
   } catch (error) {
     console.error('Failed to add to cart:', error);
-    const errorMsg = error?.response?.data?.message || error?.message || 'Failed to add item to cart';
+    const errorMsg =
+      error?.response?.data?.message ||
+      error?.message ||
+      'Failed to add item to cart';
+
     yield put({
       type: cartActions.ADD_TO_CART_FAILURE,
       payload: errorMsg,
