@@ -7,7 +7,8 @@ function* fetchProfile() {
 
   try {
     const response = yield call(apiClient.get, '/api/account/profile');
-    yield put(setProfile(response.data));
+    // API đã unwrap dữ liệu, response là dữ liệu trực tiếp
+    yield put(setProfile(response || null));
   } catch (error) {
     console.error('Failed to fetch profile:', error);
     yield put(setProfile(null));

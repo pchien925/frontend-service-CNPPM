@@ -1,12 +1,18 @@
 // src/store/selectors/cartSelector.js
 
-export const selectCartItems = (state) => state.cart.items;
+export const selectCart = (state) => state.cart.cart;
 
-export const selectCartTotalItems = (state) => state.cart.totalItems;
+export const selectCartItems = (state) => state.cart.cart?.items || [];
 
-export const selectCartTotalPrice = (state) => state.cart.totalPrice;
+export const selectCartTotalPrice = (state) => state.cart.cart?.totalPrice || 0;
 
-export const selectCartItemById = (foodId) => (state) =>
-  state.cart.items.find((item) => item.foodId === foodId);
+export const selectCartLoading = (state) => state.cart.loading;
 
-export const selectCartIsEmpty = (state) => state.cart.items.length === 0;
+export const selectCartError = (state) => state.cart.error;
+
+export const selectCartSuccess = (state) => state.cart.success;
+
+export const selectCartIsEmpty = (state) => {
+  const items = state.cart.cart?.items || [];
+  return items.length === 0;
+};

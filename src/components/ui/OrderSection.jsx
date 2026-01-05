@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Plus, Minus, ShoppingCart } from 'lucide-react';
-import { addToCart } from '../../store/reducers/cartReducer';
+import { addToCart } from '../../store/actions/cartAction';
 import styles from './OrderSection.module.css';
 
 export default function OrderSection({ product, food, type = 'food' }) {
@@ -51,10 +51,21 @@ export default function OrderSection({ product, food, type = 'food' }) {
 
   // Kiểm tra bắt buộc options đã chọn
   const validateRequired = () => {
-    for (const option of requiredOptions) {
-      if (!selectedOptions[option.id] || selectedOptions[option.id].length === 0) {
-        setOrderMessage(`⚠️ Vui lòng chọn "${option.option.name}"`);
-        return false;
+    // If there are required options but no option values defined yet (waiting for API),
+    // don't block submission - just show warning
+    if (requiredOptions.length > 0) {
+      const hasAnyOptionValues = requiredOptions.some(
+        (opt) => opt.option?.values && opt.option.values.length > 0
+      );
+      
+      // If options are defined in UI, validate them
+      if (hasAnyOptionValues) {
+        for (const option of requiredOptions) {
+          if (!selectedOptions[option.id] || selectedOptions[option.id].length === 0) {
+            setOrderMessage(`⚠️ Vui lòng chọn "${option.option.name}"`);
+            return false;
+          }
+        }
       }
     }
     return true;
@@ -67,11 +78,11 @@ export default function OrderSection({ product, food, type = 'food' }) {
     }
 
     const orderData = {
-      foodId: food.id,
-      foodName: food.name,
+      foodId: item.id,
+      foodName: item.name,
       quantity,
-      basePrice: food.basePrice,
-      totalPrice: food.basePrice * quantity,
+      basePrice: item.basePrice,
+      totalPrice: item.basePrice * quantity,
       selectedOptions: Object.entries(selectedOptions).map(([optionId, values]) => ({
         optionId,
         values,

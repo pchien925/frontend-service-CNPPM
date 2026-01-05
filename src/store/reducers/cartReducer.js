@@ -1,121 +1,151 @@
 // src/store/reducers/cartReducer.js
+import * as cartActions from '../actions/cartAction';
+
 const initialState = {
-  items: [],
-  totalItems: 0,
-  totalPrice: 0,
+  cart: {
+    id: null,
+    totalPrice: 0,
+    items: [],
+  },
+  loading: false,
+  error: null,
+  success: null,
 };
 
 export default function cartReducer(state = initialState, action) {
   switch (action.type) {
-    case 'ADD_TO_CART': {
-      const { item } = action.payload;
-      const existingItem = state.items.find(
-        (cartItem) =>
-          cartItem.foodId === item.foodId &&
-          JSON.stringify(cartItem.selectedOptions) ===
-            JSON.stringify(item.selectedOptions)
-      );
-
-      let updatedItems;
-      if (existingItem) {
-        // Tăng số lượng nếu đã có
-        updatedItems = state.items.map((cartItem) =>
-          cartItem === existingItem
-            ? { ...cartItem, quantity: cartItem.quantity + item.quantity }
-            : cartItem
-        );
-      } else {
-        // Thêm mới
-        updatedItems = [...state.items, item];
-      }
-
-      // Tính tổng
-      const totalItems = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
-      const totalPrice = updatedItems.reduce(
-        (sum, item) => sum + item.totalPrice,
-        0
-      );
-
+    // Fetch cart
+    case cartActions.FETCH_CART_REQUEST:
       return {
-        items: updatedItems,
-        totalItems,
-        totalPrice,
+        ...state,
+        loading: true,
+        error: null,
       };
-    }
 
-    case 'REMOVE_FROM_CART': {
-      const { foodId, selectedOptions } = action.payload;
-      const updatedItems = state.items.filter(
-        (item) =>
-          !(
-            item.foodId === foodId &&
-            JSON.stringify(item.selectedOptions) === JSON.stringify(selectedOptions)
-          )
-      );
-
-      const totalItems = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
-      const totalPrice = updatedItems.reduce(
-        (sum, item) => sum + item.totalPrice,
-        0
-      );
-
+    case cartActions.SET_CART:
       return {
-        items: updatedItems,
-        totalItems,
-        totalPrice,
+        ...state,
+        cart: action.payload,
+        loading: false,
+        error: null,
       };
-    }
 
-    case 'UPDATE_CART_ITEM': {
-      const { foodId, selectedOptions, quantity } = action.payload;
-      const updatedItems = state.items.map((item) =>
-        item.foodId === foodId &&
-        JSON.stringify(item.selectedOptions) === JSON.stringify(selectedOptions)
-          ? {
-              ...item,
-              quantity,
-              totalPrice: item.basePrice * quantity,
-            }
-          : item
-      );
-
-      const totalItems = updatedItems.reduce((sum, item) => sum + item.quantity, 0);
-      const totalPrice = updatedItems.reduce(
-        (sum, item) => sum + item.totalPrice,
-        0
-      );
-
+    case cartActions.FETCH_CART_FAILURE:
       return {
-        items: updatedItems,
-        totalItems,
-        totalPrice,
+        ...state,
+        loading: false,
+        error: action.payload,
       };
-    }
 
-    case 'CLEAR_CART':
-      return initialState;
+    // Add to cart
+    case cartActions.ADD_TO_CART_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+        success: null,
+      };
+
+    case cartActions.ADD_TO_CART_SUCCESS:
+      return {
+        ...state,
+        cart: action.payload,
+        loading: false,
+        error: null,
+        success: 'Item added to cart successfully',
+      };
+
+    case cartActions.ADD_TO_CART_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
+
+    // Update cart item
+    case cartActions.UPDATE_CART_ITEM_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+        success: null,
+      };
+
+    case cartActions.UPDATE_CART_ITEM_SUCCESS:
+      return {
+        ...state,
+        cart: action.payload,
+        loading: false,
+        error: null,
+        success: 'Cart item updated successfully',
+      };
+
+    case cartActions.UPDATE_CART_ITEM_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
+
+    // Delete cart item
+    case cartActions.DELETE_CART_ITEM_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+        success: null,
+      };
+
+    case cartActions.DELETE_CART_ITEM_SUCCESS:
+      return {
+        ...state,
+        cart: action.payload,
+        loading: false,
+        error: null,
+        success: 'Item removed from cart',
+      };
+
+    case cartActions.DELETE_CART_ITEM_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
+
+    // Clear cart
+    case cartActions.CLEAR_CART_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+        success: null,
+      };
+
+    case cartActions.CLEAR_CART_SUCCESS:
+      return {
+        ...state,
+        cart: action.payload,
+        loading: false,
+        error: null,
+        success: 'Cart cleared successfully',
+      };
+
+    case cartActions.CLEAR_CART_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
+
+    // Reset error
+    case cartActions.RESET_CART_ERROR:
+      return {
+        ...state,
+        error: null,
+        success: null,
+      };
 
     default:
       return state;
   }
 }
-
-// Actions
-export const addToCart = (item) => ({
-  type: 'ADD_TO_CART',
-  payload: { item },
-});
-
-export const removeFromCart = (foodId, selectedOptions) => ({
-  type: 'REMOVE_FROM_CART',
-  payload: { foodId, selectedOptions },
-});
-
-export const updateCartItem = (foodId, selectedOptions, quantity) => ({
-  type: 'UPDATE_CART_ITEM',
-  payload: { foodId, selectedOptions, quantity },
-});
-
-export const clearCart = () => ({
-  type: 'CLEAR_CART',
-});

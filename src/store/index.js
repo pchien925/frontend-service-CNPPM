@@ -4,6 +4,7 @@ import authReducer from './reducers/authReducer';
 import authSaga from './sagas/authSaga';
 import appReducer from './reducers/appReducer';
 import cartReducer from './reducers/cartReducer';
+import cartSaga from './sagas/cartSaga';
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -18,7 +19,8 @@ const store = createStore(
   applyMiddleware(sagaMiddleware)
 );
 
-// Chạy saga
+// Chạy sagas
 sagaMiddleware.run(authSaga);
+sagaMiddleware.run(cartSaga);
 
 export default store;
