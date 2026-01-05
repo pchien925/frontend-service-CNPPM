@@ -99,13 +99,6 @@ export default function OrderSection({ product, food, foodOptions = [], type = '
     dispatch(addToCart(orderData));
     
     setOrderMessage(`✅ Đã thêm ${quantity} ${item.name} vào giỏ hàng`);
-
-    // Reset form sau 2s
-    setTimeout(() => {
-      setOrderMessage('');
-      setQuantity(1);
-      setSelectedOptions({});
-    }, 2000);
   };
 
   // Xử lý thêm vào giỏ hàng (tương tự)
