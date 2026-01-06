@@ -11,6 +11,7 @@ import {
   ShoppingBag,
   Info,
   ShoppingCart,
+  Clock,
 } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 import useCart from '../../hooks/useCart';
@@ -106,6 +107,13 @@ const Header = () => {
                       onClick={() => setDropdownOpen(false)}
                     >
                       <User className="w-4 h-4 mr-3" /> Hồ sơ cá nhân
+                    </Link>
+                    <Link
+                      to="/order-history"
+                      className="flex items-center px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      <Clock className="w-4 h-4 mr-3" /> Lịch sử đơn hàng
                     </Link>
                     <Link
                       to="/settings"

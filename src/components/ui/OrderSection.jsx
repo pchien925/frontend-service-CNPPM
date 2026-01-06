@@ -6,7 +6,13 @@ import { addToCart } from '../../store/actions/cartAction';
 import { getOptionValues } from '../../services/optionService';
 import styles from './OrderSection.module.css';
 
-export default function OrderSection({ product, food, foodOptions = [], type = 'food' }) {
+export default function OrderSection({ 
+  product, 
+  food, 
+  foodOptions = [], 
+  type = 'food',
+  comboGroupSelections = { selections: {}, isValid: false, extraPrice: 0 }
+}) {
   // Support both 'product' và 'food' props for flexibility
   const item = product || food;
   const dispatch = useDispatch();
@@ -104,11 +110,12 @@ export default function OrderSection({ product, food, foodOptions = [], type = '
     return extraPrice;
   };
 
-  // Tính tổng giá (giá gốc + giá thêm) * số lượng
+  // Tính tổng giá (giá gốc + giá thêm + combo group extra price) * số lượng
   const calculateTotalPrice = () => {
     const basePrice = Number(item.basePrice) || 0;
-    const extraPrice = calculateExtraPrice();
-    const pricePerItem = basePrice + extraPrice;
+    const optionExtraPrice = calculateExtraPrice();
+    const comboGroupExtraPrice = type === 'combo' ? (comboGroupSelections.extraPrice || 0) : 0;
+    const pricePerItem = basePrice + optionExtraPrice + comboGroupExtraPrice;
     return pricePerItem * Math.max(1, quantity);
   };
   const validateRequired = () => {
@@ -132,6 +139,12 @@ export default function OrderSection({ product, food, foodOptions = [], type = '
       return;
     }
 
+    // Validate combo groups if it's a combo
+    if (type === 'combo' && !comboGroupSelections.isValid) {
+      setOrderMessage('⚠️ Vui lòng hoàn thành tất cả các lựa chọn combo bắt buộc');
+      return;
+    }
+
     // Flatten selectedOptions vào một mảng optionIds
     const optionIds = [];
     for (const foodOptionId in selectedOptions) {
@@ -139,13 +152,21 @@ export default function OrderSection({ product, food, foodOptions = [], type = '
       optionIds.push(...selectedValueIds);
     }
 
+    // Build comboSelectionFoodIds từ combo group selections
+    const comboSelectionFoodIds = type === 'combo' 
+      ? Object.values(comboGroupSelections.selections).flat() 
+      : undefined;
+
     // Payload phải match với API requirement
     const cartPayload = {
-      itemId: String(item.id),           // ✅ Phải là string
-      itemKind: 1,                       // ✅ 1 = Food, 2 = Combo
+      itemId: String(item.id),
+      itemKind: type === 'combo' ? 2 : 1,  // 1 = Food, 2 = Combo
       quantity: Math.max(1, quantity),
       note: orderMessage.trim() || undefined,
       optionIds: optionIds.length > 0 ? optionIds : undefined,
+      comboSelectionFoodIds: comboSelectionFoodIds && comboSelectionFoodIds.length > 0 
+        ? comboSelectionFoodIds 
+        : undefined,
     };
 
     console.log('🛒 Add to Cart Payload:', cartPayload);

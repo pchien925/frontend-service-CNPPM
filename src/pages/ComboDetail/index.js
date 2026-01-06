@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getComboDetail } from '../../services/comboService';
 import OrderSection from '../../components/ui/OrderSection';
+import ComboGroupSection from '../../components/ui/ComboGroupSection';
 import { buildImageUrl } from '../../utils/imageUrl';
 import { ArrowLeft, Loader, AlertCircle, Clock } from 'lucide-react';
 import styles from './ComboDetail.module.css';
@@ -13,6 +14,11 @@ export default function ComboDetailPage() {
   const [combo, setCombo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [comboGroupSelections, setComboGroupSelections] = useState({
+    selections: {},
+    isValid: false,
+    extraPrice: 0,
+  });
 
   useEffect(() => {
     fetchComboDetail();
@@ -184,7 +190,20 @@ export default function ComboDetailPage() {
           </div>
 
           {/* Order Section */}
-          <OrderSection product={combo} type="combo" />
+          <OrderSection 
+            product={combo} 
+            type="combo"
+            comboGroupSelections={comboGroupSelections}
+          />
+
+          {/* Combo Group Selection */}
+          {comboId && (
+            <ComboGroupSection
+              comboId={comboId}
+              onSelectionsChange={setComboGroupSelections}
+              formatPrice={formatPrice}
+            />
+          )}
         </div>
       </div>
     </div>

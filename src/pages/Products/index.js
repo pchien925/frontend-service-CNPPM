@@ -14,6 +14,12 @@ export default function ProductsPage() {
   const [loadingCombos, setLoadingCombos] = useState(true);
   const [errorFoods, setErrorFoods] = useState(null);
   const [errorCombos, setErrorCombos] = useState(null);
+  const [foodPage, setFoodPage] = useState(0);
+  const [comboPage, setComboPage] = useState(0);
+  const [allFoods, setAllFoods] = useState([]);
+  const [allCombos, setAllCombos] = useState([]);
+  const [totalFoods, setTotalFoods] = useState(0);
+  const [totalCombos, setTotalCombos] = useState(0);
 
   // Utility to identify featured items (bestsellers or first in list)
   const isBestseller = (item) => item.tags?.some((tag) => tag.name === 'Bán chạy');
@@ -27,20 +33,25 @@ export default function ProductsPage() {
   };
 
   // Sort items to show featured first
-  const sortedFoods = foods.length > 0
-    ? [...foods].sort((a, b) => {
+  const sortedFoods = allFoods.length > 0
+    ? [...allFoods].sort((a, b) => {
         const aFeatured = isBestseller(a) ? 0 : 1;
         const bFeatured = isBestseller(b) ? 0 : 1;
         return aFeatured - bFeatured;
       })
     : [];
 
-  const sortedCombos = combos.length > 0
-    ? [...combos].sort(() => Math.random() - 0.5).slice(0, 10) // Shuffle & limit combos
+  const sortedCombos = allCombos.length > 0
+    ? [...allCombos].sort((a, b) => {
+        const aFeatured = isBestseller(a) ? 0 : 1;
+        const bFeatured = isBestseller(b) ? 0 : 1;
+        return aFeatured - bFeatured;
+      })
     : [];
 
-  // Get featured items for front placement
-  const featuredCombos = getFeaturedItems(sortedCombos, 2);
+  // Display sorted items
+  const displayedFoods = sortedFoods;
+  const displayedCombos = sortedCombos;
 
   useEffect(() => {
     fetchFoods();
@@ -51,9 +62,12 @@ export default function ProductsPage() {
     try {
       setLoadingFoods(true);
       setErrorFoods(null);
-      const response = await getFoodList(0, 20);
-      const { content } = response.data || response;
+      const response = await getFoodList(0, 10);
+      const { content, totalElements } = response.data || response;
+      setAllFoods(content || []);
       setFoods(content || []);
+      setTotalFoods(totalElements || 0);
+      setFoodPage(0);
     } catch (err) {
       console.error('Lỗi tải danh sách món ăn:', err);
       setErrorFoods('Không thể tải danh sách món ăn');
@@ -62,18 +76,45 @@ export default function ProductsPage() {
     }
   };
 
+  const loadMoreFoods = async () => {
+    try {
+      const nextPage = foodPage + 1;
+      const response = await getFoodList(nextPage, 10);
+      const { content } = response.data || response;
+      setAllFoods((prev) => [...prev, ...(content || [])]);
+      setFoodPage(nextPage);
+    } catch (err) {
+      console.error('Lỗi tải thêm món ăn:', err);
+    }
+  };
+
   const fetchCombos = async () => {
     try {
       setLoadingCombos(true);
       setErrorCombos(null);
-      const response = await getComboList(0, 20);
-      const { content } = response.data || response;
+      const response = await getComboList(0, 10);
+      const { content, totalElements } = response.data || response;
+      setAllCombos(content || []);
       setCombos(content || []);
+      setTotalCombos(totalElements || 0);
+      setComboPage(0);
     } catch (err) {
       console.error('Lỗi tải danh sách combo:', err);
       setErrorCombos('Không thể tải danh sách combo');
     } finally {
       setLoadingCombos(false);
+    }
+  };
+
+  const loadMoreCombos = async () => {
+    try {
+      const nextPage = comboPage + 1;
+      const response = await getComboList(nextPage, 10);
+      const { content } = response.data || response;
+      setAllCombos((prev) => [...prev, ...(content || [])]);
+      setComboPage(nextPage);
+    } catch (err) {
+      console.error('Lỗi tải thêm combo:', err);
     }
   };
 
@@ -106,14 +147,23 @@ export default function ProductsPage() {
             </button>
           </div>
         ) : foods.length > 0 ? (
-          <div className={styles.grid}>
-            {sortedFoods.map((food, index) => (
-              <FoodCard 
-                key={food.id} 
-                food={food}
-                featured={index < 2 && isBestseller(food)}
-              />
-            ))}
+          <div>
+            <div className={styles.grid}>
+              {displayedFoods.map((food, index) => (
+                <FoodCard 
+                  key={food.id} 
+                  food={food}
+                  featured={index < 2 && isBestseller(food)}
+                />
+              ))}
+            </div>
+            {allFoods.length < totalFoods && (
+              <div className={styles.loadMoreContainer}>
+                <button onClick={loadMoreFoods} className={styles.loadMoreBtn}>
+                  Xem thêm món ăn
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className={styles.empty}>
@@ -143,14 +193,23 @@ export default function ProductsPage() {
             </button>
           </div>
         ) : combos.length > 0 ? (
-          <div className={styles.grid}>
-            {featuredCombos.map((combo, index) => (
-              <ComboCard 
-                key={combo.id} 
-                combo={combo}
-                featured={index < 2}
-              />
-            ))}
+          <div>
+            <div className={styles.grid}>
+              {displayedCombos.map((combo, index) => (
+                <ComboCard 
+                  key={combo.id} 
+                  combo={combo}
+                  featured={index < 2 && isBestseller(combo)}
+                />
+              ))}
+            </div>
+            {allCombos.length < totalCombos && (
+              <div className={styles.loadMoreContainer}>
+                <button onClick={loadMoreCombos} className={styles.loadMoreBtn}>
+                  Xem thêm combo
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className={styles.empty}>

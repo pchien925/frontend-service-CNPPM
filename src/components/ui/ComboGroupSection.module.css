@@ -1,0 +1,244 @@
+/* src/components/ui/ComboGroupSection.module.css */
+
+.comboGroupSection {
+  padding: 20px 0;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 20px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.loadingContainer {
+  padding: 20px;
+  text-align: center;
+  color: #999;
+}
+
+.groupContainer {
+  margin-bottom: 20px;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.groupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: #f9f9f9;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.groupHeader:hover {
+  background: #f5f5f5;
+}
+
+.groupHeader.error {
+  background: #fff7f6;
+  border-left: 4px solid #ff4d4f;
+}
+
+.groupInfo {
+  flex: 1;
+}
+
+.groupName {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 4px 0;
+}
+
+.groupDescription {
+  font-size: 13px;
+  color: #999;
+  margin: 0 0 6px 0;
+}
+
+.selectCount {
+  font-size: 12px;
+  color: #666;
+  display: inline-block;
+}
+
+.chevron {
+  margin-left: 16px;
+  color: #666;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.chevron.expanded {
+  transform: rotate(180deg);
+}
+
+.errorMessage {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #fff7f6;
+  border-top: 1px solid #ffccc7;
+  color: #ff4d4f;
+  font-size: 13px;
+}
+
+.itemsContainer {
+  padding: 16px;
+  background: #fff;
+  border-top: 1px solid #f0f0f0;
+}
+
+.noItems {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-size: 13px;
+  margin: 0;
+}
+
+.itemCard {
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.itemCard:last-child {
+  margin-bottom: 0;
+}
+
+.itemCard:hover {
+  border-color: #ff4d4f;
+  background: #fafafa;
+}
+
+.itemCard.selected {
+  border-color: #ff4d4f;
+  background: #fff7f6;
+}
+
+.itemLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.itemInput {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.itemInput:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.itemContent {
+  flex: 1;
+}
+
+.itemName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.extraPrice {
+  font-size: 12px;
+  color: #ff4d4f;
+  font-weight: 600;
+}
+
+.itemDescription {
+  font-size: 12px;
+  color: #999;
+  margin: 0 0 4px 0;
+}
+
+.itemPrice {
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Item Options (shown when selected) */
+.itemOptions {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.option {
+  margin-bottom: 12px;
+}
+
+.option:last-child {
+  margin-bottom: 0;
+}
+
+.optionName {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.required {
+  color: #ff4d4f;
+}
+
+.optionDescription {
+  font-size: 12px;
+  color: #999;
+  margin: 4px 0 8px 0;
+}
+
+.optionValues {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 12px;
+}
+
+.valueItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.valueItem input[type='radio'],
+.valueItem input[type='checkbox'] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.valueName {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

@@ -137,6 +137,34 @@
   margin: 0;
 }
 
+.loadMoreContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.loadMoreBtn {
+  padding: 12px 32px;
+  background: #ff4d4f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.loadMoreBtn:hover {
+  background: #ff7875;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.3);
+}
+
+.loadMoreBtn:active {
+  transform: translateY(0);
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .grid {
