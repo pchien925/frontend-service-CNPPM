@@ -75,7 +75,13 @@
   gap: 8px;
 }
 
-.optionValue {
+.valuesContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.valueItem {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -86,17 +92,19 @@
   transition: all 0.3s ease;
 }
 
-.optionValue:hover {
+.valueItem:hover {
   background: #f9f9f9;
   border-color: #ff4d4f;
 }
 
-.optionValue input[type='radio'],
-.optionValue input[type='checkbox'] {
+.valueItem input[type='radio'],
+.valueItem input[type='checkbox'] {
   cursor: pointer;
+  width: 16px;
+  height: 16px;
 }
 
-.optionValueLabel {
+.valueName {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -106,7 +114,7 @@
   color: #333;
 }
 
-.optionValuePrice {
+.extraPrice {
   font-size: 12px;
   color: #ff4d4f;
   font-weight: 600;

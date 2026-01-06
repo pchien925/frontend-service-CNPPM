@@ -32,7 +32,7 @@ function* addToCartSaga(action) {
 
     yield put({
       type: cartActions.ADD_TO_CART_SUCCESS,
-      payload: response || {},
+      payload: response.data || {},
     });
   } catch (error) {
     console.error('Failed to add to cart:', error);
@@ -53,11 +53,10 @@ function* addToCartSaga(action) {
  */
 function* updateCartItemSaga(action) {
   try {
-    yield put({ type: cartActions.UPDATE_CART_ITEM_REQUEST });
     const response = yield call(cartService.updateCartItem, action.payload);
     yield put({
       type: cartActions.UPDATE_CART_ITEM_SUCCESS,
-      payload: response || {},
+      payload: response.data || {},
     });
   } catch (error) {
     console.error('Failed to update cart item:', error);
@@ -73,14 +72,13 @@ function* updateCartItemSaga(action) {
  */
 function* deleteCartItemSaga(action) {
   try {
-    yield put({ type: cartActions.DELETE_CART_ITEM_REQUEST });
     const response = yield call(
       cartService.deleteCartItem,
       action.payload.cartItemId
     );
     yield put({
       type: cartActions.DELETE_CART_ITEM_SUCCESS,
-      payload: response || {},
+      payload: response.data || {},
     });
   } catch (error) {
     console.error('Failed to delete cart item:', error);
@@ -96,11 +94,10 @@ function* deleteCartItemSaga(action) {
  */
 function* clearCartSaga() {
   try {
-    yield put({ type: cartActions.CLEAR_CART_REQUEST });
     const response = yield call(cartService.clearCart);
     yield put({
       type: cartActions.CLEAR_CART_SUCCESS,
-      payload: response || {},
+      payload: response.data || {},
     });
   } catch (error) {
     console.error('Failed to clear cart:', error);
