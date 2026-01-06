@@ -1,23 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Plus,
-  Edit2,
-  Trash2,
-  MapPin,
-  Phone,
-  Loader,
-  X,
-  Check,
+  Plus, Edit2, Trash2, MapPin, Phone, Loader, X, Check, ArrowLeft
 } from 'lucide-react';
 import useAuth from '../../hooks/useAuth';
 import addressService from '../../services/addressService';
 import nationService from '../../services/nationService';
 import styles from './AddressManagement.module.css';
 
+// Khai báo giá trị mặc định của form bên ngoài component
+const initialFormState = {
+  recipientName: '',
+  phone: '',
+  addressLine: '',
+  provinceId: '',
+  districtId: '',
+  wardId: '',
+  isDefault: false,
+};
+
 export default function AddressManagementPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  
+  // States chính
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,144 +31,110 @@ export default function AddressManagementPage() {
   const [editingId, setEditingId] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
 
-  // Nation data
+  // States dữ liệu hành chính
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
-  const [loadingNations, setLoadingNations] = useState(false);
 
-  const [formData, setFormData] = useState({
-    recipientName: '',
-    phone: '',
-    addressLine: '',
-    provinceId: '',
-    districtId: '',
-    wardId: '',
-    isDefault: false,
-  });
+  const [formData, setFormData] = useState(initialFormState);
 
-  // Fetch addresses and provinces on mount
+  // 1. Khởi tạo dữ liệu
   useEffect(() => {
     fetchAddresses();
     fetchProvinces();
-  }, []);
-
-  // Fetch districts when province changes
-  useEffect(() => {
-    if (formData.provinceId) {
-      fetchDistricts(formData.provinceId);
-      // Reset district and ward when province changes
-      setFormData((prev) => ({
-        ...prev,
-        districtId: '',
-        wardId: '',
-      }));
-    } else {
-      setDistricts([]);
-      setWards([]);
-    }
-  }, [formData.provinceId]);
-
-  // Fetch wards when district changes
-  useEffect(() => {
-    if (formData.districtId) {
-      fetchWards(formData.districtId);
-      // Reset ward when district changes
-      setFormData((prev) => ({
-        ...prev,
-        wardId: '',
-      }));
-    } else {
-      setWards([]);
-    }
-  }, [formData.districtId]);
+  }, [user]);
 
   const fetchAddresses = async () => {
     try {
       setLoading(true);
-      const res = await addressService.getAddressList({
-        accountId: user?.id,
-      });
-      if (res.result && Array.isArray(res.data)) {
-        setAddresses(res.data);
-      }
+      const accountId = user?.data?.id || user?.id;
+      if (!accountId) return;
+      
+      const res = await addressService.getAddressList({ accountId });
+      if (res.result) setAddresses(res.data.content || []);
     } catch (err) {
       setError('Không thể tải danh sách địa chỉ');
-      console.error('Fetch addresses error:', err);
     } finally {
       setLoading(false);
     }
   };
 
   const fetchProvinces = async () => {
-    try {
-      setLoadingNations(true);
-      const result = await nationService.getProvinces();
-      setProvinces(result || []);
-    } catch (err) {
-      console.error('Fetch provinces error:', err);
-      setProvinces([]);
-    } finally {
-      setLoadingNations(false);
-    }
+    const data = await nationService.getProvinces();
+    setProvinces(data || []);
   };
 
-  const fetchDistricts = async (provinceId) => {
-    try {
-      const result = await nationService.getDistricts(provinceId);
-      setDistricts(result || []);
-    } catch (err) {
-      console.error('Fetch districts error:', err);
+  // 2. Logic Mở Form Thêm Mới (Quan trọng để reset dữ liệu)
+  const handleAddNew = () => {
+    setFormData(initialFormState); // Xóa dữ liệu cũ trong form
+    setDistricts([]);              // Xóa danh sách quận cũ
+    setWards([]);                  // Xóa danh sách phường cũ
+    setEditingId(null);            // Đặt về chế độ thêm mới
+    setShowForm(true);             // Hiện form
+    setError(null);
+  };
+
+  // 3. Logic thay đổi cấp hành chính (Cascading Select)
+  const handleProvinceChange = async (e) => {
+    const id = e.target.value;
+    setFormData(prev => ({ ...prev, provinceId: id, districtId: '', wardId: '' }));
+    setWards([]);
+    if (id) {
+      const data = await nationService.getDistricts(id);
+      setDistricts(data || []);
+    } else {
       setDistricts([]);
     }
   };
 
-  const fetchWards = async (districtId) => {
-    try {
-      const result = await nationService.getWards(districtId);
-      setWards(result || []);
-    } catch (err) {
-      console.error('Fetch wards error:', err);
+  const handleDistrictChange = async (e) => {
+    const id = e.target.value;
+    setFormData(prev => ({ ...prev, districtId: id, wardId: '' }));
+    if (id) {
+      const data = await nationService.getWards(id);
+      setWards(data || []);
+    } else {
       setWards([]);
     }
   };
 
-  const handleAddNew = () => {
-    setEditingId(null);
-    setFormData({
-      recipientName: '',
-      phone: '',
-      addressLine: '',
-      provinceId: '',
-      districtId: '',
-      wardId: '',
-      isDefault: false,
-    });
-    setShowForm(true);
-  };
+  // 4. Xử lý Sửa địa chỉ
+  const handleEdit = async (address) => {
+    try {
+      setFormLoading(true);
+      setEditingId(address.id);
+      setShowForm(true);
 
-  const handleEdit = (address) => {
-    setEditingId(address.id);
-    setFormData({
-      recipientName: address.recipientName || '',
-      phone: address.phone || '',
-      addressLine: address.addressLine || '',
-      provinceId: address.province?.id || '',
-      districtId: address.district?.id || '',
-      wardId: address.ward?.id || '',
-      isDefault: address.isDefault || false,
-    });
-    setShowForm(true);
-  };
+      // Load dữ liệu phụ thuộc đồng thời
+      const [distData, wardData] = await Promise.all([
+        nationService.getDistricts(address.province?.id),
+        nationService.getWards(address.district?.id)
+      ]);
 
-  const handleCancel = () => {
-    setShowForm(false);
-    setEditingId(null);
+      setDistricts(distData || []);
+      setWards(wardData || []);
+
+      setFormData({
+        recipientName: address.recipientName || '',
+        phone: address.phone || '',
+        addressLine: address.addressLine || '',
+        provinceId: address.province?.id || '',
+        districtId: address.district?.id || '',
+        wardId: address.ward?.id || '',
+        isDefault: address.isDefault || false,
+      });
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      setError("Lỗi khi tải thông tin chi tiết địa chỉ");
+    } finally {
+      setFormLoading(false);
+    }
   };
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
@@ -170,331 +142,160 @@ export default function AddressManagementPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (
-      !formData.recipientName ||
-      !formData.phone ||
-      !formData.addressLine
-    ) {
-      setError('Vui lòng điền đầy đủ thông tin bắt buộc');
+    if (!formData.recipientName || !formData.phone || !formData.provinceId) {
+      setError('Vui lòng nhập đầy đủ các trường bắt buộc');
       return;
     }
 
     try {
       setFormLoading(true);
-      const payload = {
-        ...formData,
-        accountId: user?.id,
-      };
+      const accountId = user?.data?.id || user?.id;
+      const payload = { ...formData, accountId };
 
-      let res;
-      if (editingId) {
-        res = await addressService.updateAddress({
-          id: editingId,
-          ...payload,
-        });
-      } else {
-        res = await addressService.createAddress(payload);
-      }
+      const res = editingId 
+        ? await addressService.updateAddress({ id: editingId, ...payload })
+        : await addressService.createAddress(payload);
 
       if (res.result) {
         setShowForm(false);
+        setEditingId(null);
+        setFormData(initialFormState); // Reset sau khi lưu thành công
         await fetchAddresses();
       } else {
-        setError(res.message || 'Không thể lưu địa chỉ');
+        setError(res.message || 'Thao tác thất bại');
       }
     } catch (err) {
-      setError('Lỗi khi lưu địa chỉ');
-      console.error('Submit error:', err);
+      setError('Lỗi kết nối máy chủ');
     } finally {
       setFormLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Bạn có chắc muốn xóa địa chỉ này?')) {
-      return;
-    }
-
+    if (!window.confirm('Xóa địa chỉ này?')) return;
     try {
       const res = await addressService.deleteAddress(id);
-      if (res.result) {
-        await fetchAddresses();
-      } else {
-        setError('Không thể xóa địa chỉ');
-      }
+      if (res.result) fetchAddresses();
     } catch (err) {
-      setError('Lỗi khi xóa địa chỉ');
-      console.error('Delete error:', err);
+      setError('Không thể xóa');
     }
   };
 
-  if (loading) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.loading}>
-          <Loader size={32} />
-          <p>Đang tải danh sách địa chỉ...</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <div className={styles.loaderContainer}><Loader className={styles.spin} /></div>;
 
   return (
     <div className={styles.container}>
-      {/* Header */}
-      <div className={styles.header}>
-        <button
-          onClick={() => navigate(-1)}
-          className={styles.backButton}
-        >
-          ← Quay lại
+      <header className={styles.header}>
+        <button onClick={() => navigate(-1)} className={styles.backBtn}>
+          <ArrowLeft size={20} /> Quay lại
         </button>
-        <h1>Quản lý địa chỉ giao hàng</h1>
-      </div>
+        <h1>Địa chỉ của tôi</h1>
+      </header>
 
-      {/* Error Message */}
       {error && (
         <div className={styles.errorAlert}>
-          <p>{error}</p>
-          <button onClick={() => setError(null)}>
-            <X size={16} />
-          </button>
+          <span>{error}</span>
+          <X size={18} onClick={() => setError(null)} style={{cursor: 'pointer'}} />
         </div>
       )}
 
-      {/* Main Content */}
-      <div className={styles.content}>
-        {/* Left Column - Address List */}
-        <div className={styles.listSection}>
-          <div className={styles.listHeader}>
-            <h2>Danh sách địa chỉ ({addresses.length})</h2>
+      <div className={styles.layout}>
+        {/* DANH SÁCH ĐỊA CHỈ */}
+        <section className={styles.listSection}>
+          <div className={styles.sectionHeader}>
+            <h2>{addresses.length} Địa chỉ đã lưu</h2>
             {!showForm && (
-              <button
-                onClick={handleAddNew}
-                className={styles.addButton}
-              >
-                <Plus size={18} /> Thêm địa chỉ mới
+              <button onClick={handleAddNew} className={styles.addBtn}>
+                <Plus size={18} /> Thêm mới
               </button>
             )}
           </div>
 
-          {addresses.length > 0 ? (
-            <div className={styles.addressesList}>
-              {addresses.map((address) => (
-                <div
-                  key={address.id}
-                  className={`${styles.addressCard} ${
-                    address.isDefault ? styles.default : ''
-                  }`}
-                >
-                  {address.isDefault && (
-                    <div className={styles.defaultBadge}>
-                      <Check size={14} /> Mặc định
-                    </div>
-                  )}
-
-                  <div className={styles.cardContent}>
-                    <h3>{address.recipientName}</h3>
-                    <div className={styles.addressInfo}>
-                      <p>
-                        <MapPin size={14} />
-                        {address.addressLine}
-                      </p>
-                      <p className={styles.area}>
-                        {address.ward?.name}, {address.district?.name},{' '}
-                        {address.province?.name}
-                      </p>
-                      <p>
-                        <Phone size={14} />
-                        {address.phone}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className={styles.cardActions}>
-                    <button
-                      onClick={() => handleEdit(address)}
-                      className={styles.editBtn}
-                    >
-                      <Edit2 size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(address.id)}
-                      className={styles.deleteBtn}
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
+          <div className={styles.grid}>
+            {addresses.map(addr => (
+              <div key={addr.id} className={`${styles.card} ${addr.isDefault ? styles.activeCard : ''}`}>
+                {addr.isDefault && <span className={styles.badge}><Check size={12}/> Mặc định</span>}
+                <div className={styles.cardInfo}>
+                  <h3>{addr.recipientName}</h3>
+                  <p className={styles.phoneText}><Phone size={14}/> {addr.phone}</p>
+                  <p className={styles.addressText}><MapPin size={14}/> {addr.addressLine}</p>
+                  <p className={styles.subText}>
+                    {addr.ward?.name}, {addr.district?.name}, {addr.province?.name}
+                  </p>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className={styles.emptyState}>
-              <MapPin size={48} />
-              <h3>Chưa có địa chỉ nào</h3>
-              <p>Thêm địa chỉ giao hàng để bắt đầu đặt hàng</p>
-              {!showForm && (
-                <button
-                  onClick={handleAddNew}
-                  className={styles.primaryButton}
-                >
-                  <Plus size={18} /> Thêm địa chỉ mới
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Right Column - Form */}
-        {showForm && (
-          <div className={styles.formSection}>
-            <h2>
-              {editingId ? 'Chỉnh sửa' : 'Thêm'} địa chỉ giao hàng
-            </h2>
-            <form onSubmit={handleSubmit} className={styles.form}>
-              <div className={styles.formGroup}>
-                <label htmlFor="recipientName">
-                  Tên người nhận <span>*</span>
-                </label>
-                <input
-                  type="text"
-                  id="recipientName"
-                  name="recipientName"
-                  value={formData.recipientName}
-                  onChange={handleInputChange}
-                  placeholder="VD: Nguyễn Văn A"
-                  disabled={formLoading}
-                />
-              </div>
-
-              <div className={styles.formGroup}>
-                <label htmlFor="phone">
-                  Số điện thoại <span>*</span>
-                </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  placeholder="VD: 0123456789"
-                  disabled={formLoading}
-                />
-              </div>
-
-              <div className={styles.formGroup}>
-                <label htmlFor="addressLine">
-                  Địa chỉ chi tiết <span>*</span>
-                </label>
-                <textarea
-                  id="addressLine"
-                  name="addressLine"
-                  value={formData.addressLine}
-                  onChange={handleInputChange}
-                  placeholder="VD: 123 Đường Hoa, Phường 1"
-                  rows="3"
-                  disabled={formLoading}
-                ></textarea>
-              </div>
-
-              <div className={styles.formRow}>
-                <div className={styles.formGroup}>
-                  <label htmlFor="provinceId">Tỉnh/Thành phố</label>
-                  <select
-                    id="provinceId"
-                    name="provinceId"
-                    value={formData.provinceId}
-                    onChange={handleInputChange}
-                    disabled={formLoading || loadingNations}
-                  >
-                    <option value="">-- Chọn tỉnh/thành phố --</option>
-                    {provinces.map((province) => (
-                      <option key={province.id} value={province.id}>
-                        {province.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label htmlFor="districtId">Quận/Huyện</label>
-                  <select
-                    id="districtId"
-                    name="districtId"
-                    value={formData.districtId}
-                    onChange={handleInputChange}
-                    disabled={formLoading || !formData.provinceId || districts.length === 0}
-                  >
-                    <option value="">-- Chọn quận/huyện --</option>
-                    {districts.map((district) => (
-                      <option key={district.id} value={district.id}>
-                        {district.name}
-                      </option>
-                    ))}
-                  </select>
+                <div className={styles.cardActions}>
+                  <button onClick={() => handleEdit(addr)} title="Sửa"><Edit2 size={16}/></button>
+                  <button onClick={() => handleDelete(addr.id)} title="Xóa" className={styles.delBtn}><Trash2 size={16}/></button>
                 </div>
               </div>
-
-              <div className={styles.formGroup}>
-                <label htmlFor="wardId">Phường/Xã</label>
-                <select
-                  id="wardId"
-                  name="wardId"
-                  value={formData.wardId}
-                  onChange={handleInputChange}
-                  disabled={formLoading || !formData.districtId || wards.length === 0}
-                >
-                  <option value="">-- Chọn phường/xã --</option>
-                  {wards.map((ward) => (
-                    <option key={ward.id} value={ward.id}>
-                      {ward.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className={styles.checkboxGroup}>
-                <label>
-                  <input
-                    type="checkbox"
-                    name="isDefault"
-                    checked={formData.isDefault}
-                    onChange={handleInputChange}
-                    disabled={formLoading}
-                  />
-                  Đặt làm địa chỉ mặc định
-                </label>
-              </div>
-
-              <div className={styles.formActions}>
-                <button
-                  type="submit"
-                  className={styles.submitButton}
-                  disabled={formLoading}
-                >
-                  {formLoading ? (
-                    <>
-                      <Loader size={16} />
-                      Đang lưu...
-                    </>
-                  ) : (
-                    <>
-                      <Check size={16} /> Lưu địa chỉ
-                    </>
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCancel}
-                  className={styles.cancelButton}
-                  disabled={formLoading}
-                >
-                  Hủy
-                </button>
-              </div>
-            </form>
+            ))}
           </div>
+        </section>
+
+        {/* FORM NHẬP LIỆU */}
+        {showForm && (
+          <aside className={styles.formSidebar}>
+            <div className={styles.formCard}>
+              <div className={styles.formCardHeader}>
+                 <h2>{editingId ? 'Cập nhật địa chỉ' : 'Địa chỉ mới'}</h2>
+                 <button className={styles.closeBtn} onClick={() => setShowForm(false)}><X size={20}/></button>
+              </div>
+              
+              <form onSubmit={handleSubmit}>
+                <div className={styles.field}>
+                  <label>Người nhận *</label>
+                  <input name="recipientName" value={formData.recipientName} onChange={handleInputChange} placeholder="Tên đầy đủ" required />
+                </div>
+
+                <div className={styles.field}>
+                  <label>Số điện thoại *</label>
+                  <input name="phone" value={formData.phone} onChange={handleInputChange} placeholder="Số điện thoại liên hệ" required />
+                </div>
+
+                <div className={styles.field}>
+                  <label>Tỉnh/Thành phố *</label>
+                  <select name="provinceId" value={formData.provinceId} onChange={handleProvinceChange} required>
+                    <option value="">Chọn Tỉnh/Thành</option>
+                    {provinces.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </select>
+                </div>
+
+                <div className={styles.row}>
+                  <div className={styles.field}>
+                    <label>Quận/Huyện</label>
+                    <select name="districtId" value={formData.districtId} onChange={handleDistrictChange} disabled={!districts.length}>
+                      <option value="">Chọn Quận/Huyện</option>
+                      {districts.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                    </select>
+                  </div>
+                  <div className={styles.field}>
+                    <label>Phường/Xã</label>
+                    <select name="wardId" value={formData.wardId} onChange={handleInputChange} disabled={!wards.length}>
+                      <option value="">Chọn Phường/Xã</option>
+                      {wards.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                <div className={styles.field}>
+                  <label>Địa chỉ cụ thể</label>
+                  <textarea name="addressLine" value={formData.addressLine} onChange={handleInputChange} placeholder="Số nhà, tên đường..." rows="2" />
+                </div>
+
+                <label className={styles.checkbox}>
+                  <input type="checkbox" name="isDefault" checked={formData.isDefault} onChange={handleInputChange} />
+                  <span>Đặt làm địa chỉ mặc định</span>
+                </label>
+
+                <div className={styles.formBtns}>
+                  <button type="submit" disabled={formLoading} className={styles.primaryBtn}>
+                    {formLoading ? <Loader className={styles.spin} size={16}/> : 'Lưu địa chỉ'}
+                  </button>
+                  <button type="button" onClick={() => {setShowForm(false); setEditingId(null);}} className={styles.secondaryBtn}>Hủy</button>
+                </div>
+              </form>
+            </div>
+          </aside>
         )}
       </div>
     </div>

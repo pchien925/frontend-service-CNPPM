@@ -1,0 +1,61 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  padding: 20px;
+  background-color: #f9fafb;
+}
+
+.card {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+}
+
+.statusContent h1 {
+  margin: 20px 0 10px;
+  font-size: 24px;
+}
+
+.icon { margin: 0 auto; }
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.successTitle { color: #22c55e; }
+.errorTitle { color: #ef4444; }
+
+.details {
+  background: #f3f4f6;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 20px 0;
+  text-align: left;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btnPrimary {
+  background: #3b82f6; color: white; border: none;
+  padding: 12px; border-radius: 6px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+
+.btnSecondary {
+  background: #6b7280; color: white; border: none;
+  padding: 12px; border-radius: 6px; cursor: pointer;
+}
+
+.btnGhost {
+  background: transparent; border: 1px solid #d1d5db;
+  padding: 12px; border-radius: 6px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}

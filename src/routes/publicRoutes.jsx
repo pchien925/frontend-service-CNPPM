@@ -9,6 +9,7 @@ import FoodDetailPage from '../pages/FoodDetail';
 import ProductsPage from '../pages/Products';
 import ComboDetailPage from '../pages/ComboDetail';
 import AboutPage from '../pages/About';
+import PaymentResultPage from '../pages/PaymentResult';
 
 export const publicRoutes = [
   { path: '/', element: <HomePage /> },
@@ -21,5 +22,6 @@ export const publicRoutes = [
   { path: '/products', element: <ProductsPage /> },
   { path: '/combos/:comboId', element: <ComboDetailPage /> },
   { path: '/about', element: <AboutPage /> },
+  { path: '/payment-result', element: <PaymentResultPage /> },
   { path: '*', element: <NotFoundPage /> },
 ];

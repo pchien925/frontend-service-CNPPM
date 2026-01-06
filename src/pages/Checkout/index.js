@@ -49,12 +49,12 @@ export default function CheckoutPage() {
 
   // Fetch addresses when delivery type is selected
   useEffect(() => {
-    if (orderType === 2 && user?.id) {
+    if (orderType === 2 && user) {
       const fetchAddresses = async () => {
         try {
           setLoading(true);
           const res = await addressService.getAddressList({
-            accountId: user.id,
+            accountId: user?.data.id,
             page: 0,
             limit: 20,
           });
@@ -72,10 +72,11 @@ export default function CheckoutPage() {
       };
       fetchAddresses();
     }
-  }, [orderType, user?.id]);
+  }, [orderType, user]);
 
   // Handle checkout
-  const handleCheckout = async () => {
+const handleCheckout = async () => {
+    // 1. Validation (Giữ nguyên các bước kiểm tra)
     if (orderType === 2 && !selectedAddress) {
       setError('Vui lòng chọn địa chỉ giao hàng');
       return;
@@ -91,6 +92,7 @@ export default function CheckoutPage() {
 
     setLoading(true);
     setError(null);
+
     try {
       const orderData = {
         type: orderType,
@@ -105,12 +107,23 @@ export default function CheckoutPage() {
         orderData.deliveryAddressId = selectedAddress;
       }
 
+      // 2. Gọi API tạo đơn hàng
       const res = await orderService.createOrder(orderData);
 
       if (res.result && res.data) {
-        setSuccessOrder(res.data);
-        clearCart();
-        setStep(5); // Success page
+        // KIỂM TRA: Nếu res.data là một URL (chứa vnpayment)
+        if (typeof res.data === 'string' && res.data.startsWith('http')) {
+          // Xóa giỏ hàng trước khi chuyển đi (tùy logic của bạn)
+          clearCart(); 
+          
+          // Chuyển hướng người dùng sang trang thanh toán VNPAY
+          window.location.href = res.data;
+        } else {
+          // Trường hợp trả về Object đơn hàng bình thường (COD)
+          setSuccessOrder(res.data);
+          clearCart();
+          setStep(5);
+        }
       } else {
         setError(res.message || 'Đặt hàng thất bại');
       }
@@ -121,7 +134,6 @@ export default function CheckoutPage() {
       setLoading(false);
     }
   };
-
   const totalAmount = totalPrice || 0;
   const shippingFee = orderType === 2 ? 15000 : 0;
 

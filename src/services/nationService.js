@@ -18,9 +18,8 @@ const nationService = {
       const res = await apiClient.get('/api/nation/list', {
         params: { page: 0, limit: 100, kind: 3 }
       });
-      
-      if (res.data?.result && res.data?.data?.content) {
-        return res.data.data.content;
+      if (res.result && res.data?.content) {
+        return res.data.content;
       }
       return [];
     } catch (err) {
@@ -43,8 +42,8 @@ const nationService = {
         }
       });
       
-      if (res.data?.result && res.data?.data?.content) {
-        return res.data.data.content;
+      if (res?.result && res.data?.content) {
+        return res.data.content;
       }
       return [];
     } catch (err) {
@@ -67,8 +66,8 @@ const nationService = {
         }
       });
       
-      if (res.data?.result && res.data?.data?.content) {
-        return res.data.data.content;
+      if (res?.result && res.data?.content) {
+        return res.data.content;
       }
       return [];
     } catch (err) {
