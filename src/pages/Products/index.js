@@ -1,73 +1,90 @@
 // src/pages/Products/index.js
 import React, { useState, useEffect } from 'react';
-import { getFoodList } from '../../services/foodService';
+import { searchFoods } from '../../services/foodService';
 import { getComboList } from '../../services/comboService';
+import { getCategoryList } from '../../services/categoryService';
 import FoodCard from '../../components/ui/FoodCard';
 import ComboCard from '../../components/ui/ComboCard';
-import { Loader, AlertCircle } from 'lucide-react';
+import { Loader, AlertCircle, Search, X } from 'lucide-react';
 import styles from './Products.module.css';
 
 export default function ProductsPage() {
   const [foods, setFoods] = useState([]);
   const [combos, setCombos] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loadingFoods, setLoadingFoods] = useState(true);
   const [loadingCombos, setLoadingCombos] = useState(true);
+  const [loadingCategories, setLoadingCategories] = useState(true);
   const [errorFoods, setErrorFoods] = useState(null);
   const [errorCombos, setErrorCombos] = useState(null);
   const [foodPage, setFoodPage] = useState(0);
   const [comboPage, setComboPage] = useState(0);
-  const [allFoods, setAllFoods] = useState([]);
-  const [allCombos, setAllCombos] = useState([]);
   const [totalFoods, setTotalFoods] = useState(0);
   const [totalCombos, setTotalCombos] = useState(0);
 
+  // Search and filter state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
+
   // Utility to identify featured items (bestsellers or first in list)
   const isBestseller = (item) => item.tags?.some((tag) => tag.name === 'Bán chạy');
-  const getFeaturedItems = (items, count = 2) => {
-    const featured = items.filter(isBestseller).slice(0, count);
-    const remaining = items.filter((item) => !isBestseller(item));
-    return [
-      ...featured.slice(0, 2),
-      ...remaining.slice(0, Math.max(0, count - featured.length)),
-    ];
-  };
 
   // Sort items to show featured first
-  const sortedFoods = allFoods.length > 0
-    ? [...allFoods].sort((a, b) => {
+  const sortedFoods = foods.length > 0
+    ? [...foods].sort((a, b) => {
         const aFeatured = isBestseller(a) ? 0 : 1;
         const bFeatured = isBestseller(b) ? 0 : 1;
         return aFeatured - bFeatured;
       })
     : [];
 
-  const sortedCombos = allCombos.length > 0
-    ? [...allCombos].sort((a, b) => {
+  const sortedCombos = combos.length > 0
+    ? [...combos].sort((a, b) => {
         const aFeatured = isBestseller(a) ? 0 : 1;
         const bFeatured = isBestseller(b) ? 0 : 1;
         return aFeatured - bFeatured;
       })
     : [];
-
-  // Display sorted items
-  const displayedFoods = sortedFoods;
-  const displayedCombos = sortedCombos;
 
   useEffect(() => {
+    fetchCategories();
     fetchFoods();
     fetchCombos();
   }, []);
 
-  const fetchFoods = async () => {
+  const fetchCategories = async () => {
+    try {
+      setLoadingCategories(true);
+      const response = await getCategoryList(0, 20);
+      const { content } = response.data || response;
+      setCategories(content || []);
+    } catch (err) {
+      console.error('Lỗi tải danh sách danh mục:', err);
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
+
+  const fetchFoods = async (page = 0, filters = {}) => {
     try {
       setLoadingFoods(true);
       setErrorFoods(null);
-      const response = await getFoodList(0, 10);
+      const response = await searchFoods({
+        page,
+        limit: 12,
+        ...filters,
+      });
       const { content, totalElements } = response.data || response;
-      setAllFoods(content || []);
-      setFoods(content || []);
+      if (page === 0) {
+        setFoods(content || []);
+      } else {
+        setFoods((prev) => [...prev, ...(content || [])]);
+      }
       setTotalFoods(totalElements || 0);
-      setFoodPage(0);
+      setFoodPage(page);
     } catch (err) {
       console.error('Lỗi tải danh sách món ăn:', err);
       setErrorFoods('Không thể tải danh sách món ăn');
@@ -77,15 +94,13 @@ export default function ProductsPage() {
   };
 
   const loadMoreFoods = async () => {
-    try {
-      const nextPage = foodPage + 1;
-      const response = await getFoodList(nextPage, 10);
-      const { content } = response.data || response;
-      setAllFoods((prev) => [...prev, ...(content || [])]);
-      setFoodPage(nextPage);
-    } catch (err) {
-      console.error('Lỗi tải thêm món ăn:', err);
-    }
+    const filters = {
+      ...(searchQuery && { name: searchQuery }),
+      ...(selectedCategory && { categoryId: selectedCategory }),
+      ...(minPrice && { minPrice: parseInt(minPrice) }),
+      ...(maxPrice && { maxPrice: parseInt(maxPrice) }),
+    };
+    await fetchFoods(foodPage + 1, filters);
   };
 
   const fetchCombos = async () => {
@@ -94,7 +109,6 @@ export default function ProductsPage() {
       setErrorCombos(null);
       const response = await getComboList(0, 10);
       const { content, totalElements } = response.data || response;
-      setAllCombos(content || []);
       setCombos(content || []);
       setTotalCombos(totalElements || 0);
       setComboPage(0);
@@ -106,17 +120,26 @@ export default function ProductsPage() {
     }
   };
 
-  const loadMoreCombos = async () => {
-    try {
-      const nextPage = comboPage + 1;
-      const response = await getComboList(nextPage, 10);
-      const { content } = response.data || response;
-      setAllCombos((prev) => [...prev, ...(content || [])]);
-      setComboPage(nextPage);
-    } catch (err) {
-      console.error('Lỗi tải thêm combo:', err);
-    }
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const filters = {
+      ...(searchQuery && { name: searchQuery }),
+      ...(selectedCategory && { categoryId: selectedCategory }),
+      ...(minPrice && { minPrice: parseInt(minPrice) }),
+      ...(maxPrice && { maxPrice: parseInt(maxPrice) }),
+    };
+    fetchFoods(0, filters);
   };
+
+  const clearFilters = () => {
+    setSearchQuery('');
+    setSelectedCategory('');
+    setMinPrice('');
+    setMaxPrice('');
+    fetchFoods(0, {});
+  };
+
+  const hasActiveFilters = searchQuery || selectedCategory || minPrice || maxPrice;
 
   return (
     <div className={styles.container}>
@@ -125,6 +148,88 @@ export default function ProductsPage() {
         <h1>Thực đơn</h1>
         <p>Khám phá những món ăn ngon lành</p>
       </div>
+
+      {/* Search and Filter Section */}
+      <section className={styles.searchSection}>
+        <form onSubmit={handleSearch} className={styles.searchForm}>
+          <div className={styles.searchBox}>
+            <Search size={20} />
+            <input
+              type="text"
+              placeholder="Tìm kiếm món ăn..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className={styles.searchInput}
+            />
+          </div>
+          <button type="submit" className={styles.searchButton}>
+            Tìm kiếm
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowFilters(!showFilters)}
+            className={styles.filterButton}
+          >
+            ⚙️ Bộ lọc
+          </button>
+        </form>
+
+        {/* Filter Panel */}
+        {showFilters && (
+          <div className={styles.filterPanel}>
+            {/* Category Filter */}
+            <div className={styles.filterGroup}>
+              <label className={styles.filterLabel}>Danh mục</label>
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className={styles.filterSelect}
+              >
+                <option value="">Tất cả danh mục</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Price Range Filter */}
+            <div className={styles.filterGroup}>
+              <label className={styles.filterLabel}>Khoảng giá</label>
+              <div className={styles.priceRange}>
+                <input
+                  type="number"
+                  placeholder="Từ"
+                  value={minPrice}
+                  onChange={(e) => setMinPrice(e.target.value)}
+                  className={styles.priceInput}
+                />
+                <span>-</span>
+                <input
+                  type="number"
+                  placeholder="Đến"
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(e.target.value)}
+                  className={styles.priceInput}
+                />
+              </div>
+            </div>
+
+            {/* Filter Actions */}
+            <div className={styles.filterActions}>
+              <button onClick={handleSearch} className={styles.applyButton}>
+                Áp dụng
+              </button>
+              {hasActiveFilters && (
+                <button onClick={clearFilters} className={styles.clearButton}>
+                  <X size={16} /> Xóa bộ lọc
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+      </section>
 
       {/* Foods Section */}
       <section className={styles.section}>
@@ -142,14 +247,14 @@ export default function ProductsPage() {
           <div className={styles.errorContainer}>
             <AlertCircle size={32} />
             <p>{errorFoods}</p>
-            <button onClick={fetchFoods} className={styles.retryBtn}>
+            <button onClick={() => fetchFoods(0, {})} className={styles.retryBtn}>
               Thử lại
             </button>
           </div>
         ) : foods.length > 0 ? (
           <div>
             <div className={styles.grid}>
-              {displayedFoods.map((food, index) => (
+              {sortedFoods.map((food, index) => (
                 <FoodCard 
                   key={food.id} 
                   food={food}
@@ -157,7 +262,7 @@ export default function ProductsPage() {
                 />
               ))}
             </div>
-            {allFoods.length < totalFoods && (
+            {foods.length < totalFoods && (
               <div className={styles.loadMoreContainer}>
                 <button onClick={loadMoreFoods} className={styles.loadMoreBtn}>
                   Xem thêm món ăn
@@ -167,7 +272,7 @@ export default function ProductsPage() {
           </div>
         ) : (
           <div className={styles.empty}>
-            <p>Không có món ăn nào</p>
+            <p>Không có món ăn nào phù hợp</p>
           </div>
         )}
       </section>
@@ -195,7 +300,7 @@ export default function ProductsPage() {
         ) : combos.length > 0 ? (
           <div>
             <div className={styles.grid}>
-              {displayedCombos.map((combo, index) => (
+              {sortedCombos.map((combo, index) => (
                 <ComboCard 
                   key={combo.id} 
                   combo={combo}
@@ -203,9 +308,9 @@ export default function ProductsPage() {
                 />
               ))}
             </div>
-            {allCombos.length < totalCombos && (
+            {combos.length < totalCombos && (
               <div className={styles.loadMoreContainer}>
-                <button onClick={loadMoreCombos} className={styles.loadMoreBtn}>
+                <button onClick={fetchCombos} className={styles.loadMoreBtn}>
                   Xem thêm combo
                 </button>
               </div>
