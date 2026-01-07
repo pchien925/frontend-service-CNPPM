@@ -51,8 +51,8 @@ export default function ProductsPage() {
 
   useEffect(() => {
     fetchCategories();
-    fetchFoods();
-    fetchCombos();
+    fetchFoods(0, {});
+    fetchCombos(0);
   }, []);
 
   const fetchCategories = async () => {
@@ -103,21 +103,29 @@ export default function ProductsPage() {
     await fetchFoods(foodPage + 1, filters);
   };
 
-  const fetchCombos = async () => {
+  const fetchCombos = async (page = 0) => {
     try {
       setLoadingCombos(true);
       setErrorCombos(null);
-      const response = await getComboList(0, 10);
+      const response = await getComboList(page, 12);
       const { content, totalElements } = response.data || response;
-      setCombos(content || []);
+      if (page === 0) {
+        setCombos(content || []);
+      } else {
+        setCombos((prev) => [...prev, ...(content || [])]);
+      }
       setTotalCombos(totalElements || 0);
-      setComboPage(0);
+      setComboPage(page);
     } catch (err) {
       console.error('Lỗi tải danh sách combo:', err);
       setErrorCombos('Không thể tải danh sách combo');
     } finally {
       setLoadingCombos(false);
     }
+  };
+
+  const loadMoreCombos = async () => {
+    await fetchCombos(comboPage + 1);
   };
 
   const handleSearch = (e) => {
@@ -310,7 +318,7 @@ export default function ProductsPage() {
             </div>
             {combos.length < totalCombos && (
               <div className={styles.loadMoreContainer}>
-                <button onClick={fetchCombos} className={styles.loadMoreBtn}>
+                <button onClick={loadMoreCombos} className={styles.loadMoreBtn}>
                   Xem thêm combo
                 </button>
               </div>
