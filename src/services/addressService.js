@@ -6,6 +6,15 @@ const addressService = {
     return apiClient.get('/api/address/list', { params });
   },
 
+  // Get addresses with pagination and accountId
+  getAddresses: (page = 0, limit = 20, accountId = null) => {
+    const params = { page, limit };
+    if (accountId) {
+      params.accountId = accountId;
+    }
+    return apiClient.get('/api/address/list', { params });
+  },
+
   // Get address detail by ID
   getAddressById: (id) => {
     return apiClient.get(`/api/address/get/${id}`);
